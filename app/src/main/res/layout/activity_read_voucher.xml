@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+
+    tools:context="com.saudisoft.mis_android.Activity.ReadVoucher_Activity">
+    <TableLayout
+        android:id="@+id/start_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:orientation="horizontal"
+        >
+        <TableRow>
+        <TextView
+            android:id="@+id/text_view_gender"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/select_Date"
+            android:textColor="@color/black"
+
+            android:textSize="@dimen/add_edit_textsize"
+            />
+        <EditText
+            android:id="@+id/edit_text_start_date"
+            android:hint="@string/start_date"
+            android:focusable="false"
+
+            android:layout_width="wrap_content"
+            android:layout_weight="8"
+            android:layout_height="wrap_content"
+            android:inputType="date"
+            android:textAppearance="?android:attr/textAppearance"
+            android:textColor="@android:color/black"
+            android:gravity="left" />
+        <!--<ImageView-->
+            <!--android:id="@+id/image_view_start_date"-->
+            <!--android:src="@android:drawable/ic_menu_my_calendar"-->
+            <!--android:background="@color/colorPrimary"-->
+            <!--android:layout_weight="5"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="match_parent" />-->
+        </TableRow>
+    </TableLayout>
+    <LinearLayout
+        android:id="@+id/Vouchers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@+id/start_date"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <ListView
+                android:id="@+id/list_vouchers"
+                android:layout_width="match_parent"
+                android:layout_height="450dp"
+                android:layout_marginTop="4dp"
+                android:dividerHeight="0.5dp" />
+
+</LinearLayout>
+</RelativeLayout>

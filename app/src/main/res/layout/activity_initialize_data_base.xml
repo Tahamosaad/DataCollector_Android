@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="8dp"
+    tools:context="com.saudisoft.mis_android.Activity.InitializeDataBaseActivity" >
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/db_setting"
+        android:textColor="@color/red_bg_header"
+        android:textSize="@dimen/large_text"/>
+    <EditText
+        android:id="@+id/txt_user_name_DB"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/user_name"
+        android:layout_marginTop="25dp"
+        android:inputType="text"
+        android:textAppearance="?android:attr/textAppearance"
+        android:textColor="@android:color/black"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:id="@+id/txt_password_DB"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txt_user_name_DB"
+        android:layout_marginTop="8dp"
+        android:hint="@string/password"
+        android:inputType="textPassword"
+        android:lines="2"
+        android:maxLines="2"
+        android:textAppearance="?android:attr/textAppearance"
+        android:textColor="@android:color/black" />
+
+
+
+
+
+    <Button
+        android:id="@+id/btn_loginDB"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingBottom="2dp"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:paddingTop="2dp"
+        android:text="@string/login"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_below="@+id/txt_password_DB"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+</RelativeLayout>

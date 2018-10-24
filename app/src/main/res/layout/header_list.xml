@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:background="@color/icons"
+    android:minHeight="@dimen/list_item_height"
+    >
+
+    <!--<ImageView-->
+    <!--android:id="@+id/list_image"-->
+    <!--android:layout_width="@dimen/list_item_height"-->
+    <!--android:layout_height="@dimen/list_item_height"-->
+    <!--android:scaleType="fitXY"-->
+    <!--android:layout_alignParentBottom="true"-->
+    <!--android:layout_alignParentTop="true" />-->
+    <RelativeLayout
+        android:id="@+id/text_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="10dp"
+
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+        <TableLayout
+            android:id="@+id/header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp">
+            <TableRow>
+                <TextView
+                    android:id="@+id/visit_id_view"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="gone"
+                     />
+
+                <TextView android:text="outlet name:"/>
+                <TextView
+                    android:id="@+id/outletname_view"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="@dimen/medium_text"
+                    android:text="@string/serials"
+                    android:textAppearance="?android:textAppearanceLarge"
+                    android:textColor="@android:color/black"
+                    android:textStyle="bold"
+                    />
+                <TextView android:text="Item name:"/>
+                <TextView
+                    android:id="@+id/itemname_view"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="@dimen/medium_text"
+                    android:text="@string/Trans_Code"
+                    android:textAppearance="?android:textAppearanceLarge"
+                    android:textColor="@android:color/black"
+                    android:textStyle="bold"
+                    />
+            </TableRow>
+            <TableRow>
+                <TextView android:text="merch name:"/>
+                <TextView
+                    android:id="@+id/merchname_view"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textColor="@android:color/black"
+                    />
+                <TextView android:text="@string/server_name"/>
+
+                <TextView
+                    android:id="@+id/cityname_view"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textColor="@android:color/black"
+                    />
+            </TableRow>
+            <TableRow>
+                <TextView android:text="Visit Date:"/>
+                <TextView
+                    android:id="@+id/visitdate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="00:00 pm"
+                    android:textColor="@android:color/black"
+                    />
+
+            </TableRow>
+        </TableLayout>
+
+
+
+    </RelativeLayout>
+</RelativeLayout>

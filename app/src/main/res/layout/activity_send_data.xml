@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.saudisoft.mis_android.Activity.SendDataToMIS">
+
+    <TableLayout
+        android:id="@+id/voucherheader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:padding="2dp">
+        <TableRow>
+            <TextView
+                android:id="@+id/TV_saved_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/vouchers"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_weight="1"
+
+                />
+            <TextView
+                android:id="@+id/TV_saved_count"
+                android:padding="2dp"
+                android:text="@string/zero"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
+                />
+        </TableRow>
+    </TableLayout>
+
+    <android.support.v7.widget.CardView
+        card_view:elevation="4dp"
+        android:id="@+id/savedlist_view"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        card_view:cardCornerRadius="2dp"
+        android:layout_below="@+id/voucherheader"
+        android:layout_marginTop="6dp">
+
+        <ListView
+            android:id="@+id/saved_voucher_hdr"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+
+            android:dividerHeight="1dp" />
+    </android.support.v7.widget.CardView>
+    <TableLayout
+        android:id="@+id/serialheader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/savedlist_view"
+        android:padding="2dp">
+        <TableRow>
+            <TextView
+                android:id="@+id/TV_saved_serial"
+                android:layout_weight="1"
+                android:text="@string/serials"
+                android:textColor="@color/colorPrimary"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textStyle="bold"
+                />
+            <TextView
+                android:id="@+id/TV_serial_count"
+                android:padding="2dp"
+                android:text="@string/zero"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
+                />
+        </TableRow>
+    </TableLayout>
+    <android.support.v7.widget.CardView
+        android:id="@+id/serial_card_view"
+        card_view:elevation="6dp"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        card_view:cardCornerRadius="2dp"
+        android:layout_below="@+id/serialheader"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <ListView
+            android:id="@+id/saved_serial_list"
+            android:layout_width="match_parent"
+            android:layout_height="170dp"
+            android:dividerHeight="1dp"
+            android:transcriptMode="normal" />
+
+    </android.support.v7.widget.CardView>
+</RelativeLayout>

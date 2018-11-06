@@ -38,7 +38,8 @@
     <string name="user_name">User Name</string>
     <string name="db_user_name">DataBase User Name</string>
     <string name="db_setting"> DataBase Connection Settings</string>
-
+    <string name="double_dot"> : </string>
+    <string name="zero">0</string>
 
     <string name="start_date">Voucher Start Date</string>
     <string name="date_picker_title">Voucher Start Date</string>

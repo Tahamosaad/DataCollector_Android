@@ -19,32 +19,46 @@
         android:paddingRight="@dimen/header_margin"
         android:paddingLeft="@dimen/header_margin"
         android:paddingBottom="@dimen/header_bottom_margin"
-        android:textSize="@dimen/text_size"
-        android:fontFamily="sans-serif"
+        android:textAppearance="?android:attr/textAppearanceLarge"
         android:textStyle="bold"
-        android:gravity="clip_horizontal" />
+        android:textColor="@color/AccentDark"
+         />
+    <Button
+        android:id="@+id/button_read_voucher"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:textSize="@dimen/large_text"
+        android:background="@color/colorPrimaryLight"
+        android:text="@string/read_voucher"
+        android:layout_marginBottom="10dp"/>
     <Button
         android:id="@+id/button_data_entry"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="70dp"
+        android:textSize="@dimen/large_text"
+        android:background="@color/colorPrimaryLight"
+        android:layout_marginBottom="10dp"
         android:text="@string/data_entry"/>
 
     <Button
         android:id="@+id/button_send_data"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="70dp"
+        android:textSize="@dimen/large_text"
+        android:background="@color/colorPrimaryLight"
         android:text="@string/send_data"/>
 
-    <Button
-        android:id="@+id/button_read_voucher"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/read_voucher"/>
+
 
     <Button
         android:id="@+id/button_exit"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:textSize="@dimen/large_text"
+        android:layout_height="50dp"
+        android:layout_marginTop="70dp"
+
+        android:background="@color/colorAccent"
         android:text="@string/Exit"/>
+
 </LinearLayout>
 

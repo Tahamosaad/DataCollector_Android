@@ -10,7 +10,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
-        android:allowBackup="true"
+
         android:icon="@mipmap/ic_mislogo"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_sslogo_round"
@@ -27,8 +27,7 @@
             android:name=".Activity.ListCompaniesActivity"
             android:label="@string/all_companies"
             android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Light.NoTitleBar"
-            />
+            android:theme="@android:style/Theme.Light.NoTitleBar" />
         <activity
             android:name=".Activity.AddCompanyActivity"
             android:label="@string/add_new_company"
@@ -46,11 +45,13 @@
             android:theme="@android:style/Theme.Light.NoTitleBar" />
         <activity android:name=".Activity.SettingActivity" />
         <activity android:name=".Activity.InitializeDataBaseActivity" />
-        <activity android:name=".Activity.ReadVoucher_Activity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".Activity.Voucher_DataEntryActivity"
-            android:screenOrientation="portrait">
-        </activity>
+        <activity
+            android:name=".Activity.ReadVoucher_Activity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.Voucher_DataEntryActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".Activity.SendDataToMIS"></activity>
     </application>
 
 </manifest>

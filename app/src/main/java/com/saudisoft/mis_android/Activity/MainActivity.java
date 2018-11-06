@@ -71,10 +71,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     {
         this.db = new InvTransTypes_DAO(this);
         this.Setting_DAO = new Setting_DAO(this);
-        DataEntry_btn=(Button)findViewById(R.id.button_data_entry);
-        SendData_btn=(Button)findViewById(R.id.button_send_data);
-        ReadVoucher_btn=(Button)findViewById(R.id.button_read_voucher);
-        Exit_btn=(Button)findViewById(R.id.button_exit);
+        DataEntry_btn=findViewById(R.id.button_data_entry);
+        SendData_btn=findViewById(R.id.button_send_data);
+        ReadVoucher_btn=findViewById(R.id.button_read_voucher);
+        Exit_btn=findViewById(R.id.button_exit);
         DataEntry_btn.setOnClickListener(this);
         SendData_btn.setOnClickListener(this);
         ReadVoucher_btn.setOnClickListener(this);
@@ -83,16 +83,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         this.setting = Setting_DAO.getAllSettings1();
         for (Settings cn : setting) {
-            DBNAME= cn.getDatabaseName().toString();
-        DBserver= cn.getServerName().toString();}
+            DBNAME= cn.getDatabaseName();
+        DBserver= cn.getServerName();}
         this. new_data = new CRUD_Operations(DBNAME,DBserver);
 
     }
     public boolean CheckConnectionSettings(){
+//        if(setting.size()<1)
+//            return false;
+//        else return true;
+        return !(setting.size()<1);
 
-        if(setting.size()<1)
-            return false;
-        else return true;
 //        for (Settings cn : setting) {
 //          cn.getServerName().toString();}
     }
@@ -142,10 +143,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private boolean Getdata(){
-        List<String> MyData = null;
-        MyData= new_data.SelectItems();
-        if(MyData.size()>0) return true;
-        else return false;
+        List<String> MyData = new_data.SelectItems();
+
+        return (MyData.size()>0) ;
     }
 
     public void onPause(){
@@ -173,11 +173,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         if(v==DataEntry_btn)
             startActivity(new Intent(this, Voucher_DataEntryActivity.class));
-//        if(v==SendData_btn)
-//        if (isNetworkAvailable())
-//            startActivity(new Intent(this, ListCompaniesActivity.class));
-//        else
-//            Toast.makeText(this,"Please Check your connection", Toast.LENGTH_SHORT).show();
+        if(v==SendData_btn)
+        if (isNetworkAvailable())
+            startActivity(new Intent(this, SendDataToMIS.class));
+        else
+            Toast.makeText(this,"Please Check your connection", Toast.LENGTH_SHORT).show();
         if(v==ReadVoucher_btn)
             if (isNetworkAvailable())
             startActivity(new Intent(this, ReadVoucher_Activity.class));

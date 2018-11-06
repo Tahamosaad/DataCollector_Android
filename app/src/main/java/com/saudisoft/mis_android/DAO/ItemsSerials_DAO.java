@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by taha.mosaad on 30/07/2018.
+ * Created by ${Taha.mosaad} on ${6/10/2018}.
  */
 
 public class ItemsSerials_DAO {
@@ -26,8 +26,8 @@ public class ItemsSerials_DAO {
     private SQLiteDatabase mDatabase;
     private DBHelper mDbHelper;
     private Context mContext;
-    private String[] mAllColumns = {DBHelper.COLUMN_SERIAL,DBHelper.COL_SERIALNUM, DBHelper.COL_ID};
-    Map<String,String> datanum;
+//    private String[] mAllColumns = {DBHelper.COLUMN_SERIAL,DBHelper.COL_SERIALNUM, DBHelper.COL_ID};
+    private Map<String,String> datanum;
 
     public ItemsSerials_DAO(Context context) {
         this.mContext = context;
@@ -41,7 +41,7 @@ public class ItemsSerials_DAO {
         }
     }
 
-    public void open() throws SQLException {
+    private void open() throws SQLException {
         mDatabase = mDbHelper.getWritableDatabase();
     }
 
@@ -54,8 +54,8 @@ public class ItemsSerials_DAO {
         ItemsInOutL Dtl = dao.getItemByItemID(serials.getmItemID());
 
         ContentValues values = new ContentValues();
-        values.put(DBHelper.COLUMN_SERIAL, serials.getSerial());
-        values.put(DBHelper.COL_SERIALNUM, serials.getSerialNum());
+        values.put(DBHelper.COLUMN_SERIAL, serials.getSerialNum());
+        values.put(DBHelper.COL_SERIALNUM,serials.getSerial() );
         values.put(DBHelper.COL_ID, Dtl.getID());
         // Inserting Row
         db.insert(DBHelper.TABLE_ITEM_SERIAL, null, values);
@@ -68,7 +68,7 @@ public class ItemsSerials_DAO {
                 + " = " + id, null);
     }
     public List<ItemSerials> getAllItemSerials() {
-        List<ItemSerials> contactList = new ArrayList<ItemSerials>();
+        List<ItemSerials> contactList = new ArrayList<>();
 //
         // Select All Query
         String selectQuery = "SELECT * FROM " + DBHelper.TABLE_ITEM_SERIAL;
@@ -102,14 +102,14 @@ public class ItemsSerials_DAO {
         return contactList;
     }
     public List<Map<String,String>> GetAllItemSerials() {
-        datanum=new HashMap<String,String>();
+        datanum=new HashMap<>();
         // Select All Query
         String selectQuery = "SELECT * FROM " + DBHelper.TABLE_ITEM_SERIAL;
 
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
-        List<Map<String, String>> data = null;
-        data = new ArrayList<Map<String, String>>();
+        List<Map<String, String>> data =new ArrayList<>();
+
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
@@ -131,30 +131,62 @@ public class ItemsSerials_DAO {
     }
 
 
-    public  List<Map<String,String>> getDetailSerials(String serial) {
-        datanum = new HashMap<String,String>();
+//    public  List<Map<String,String>> getDetailSerials(String serial) {
+//        datanum = new HashMap<>();
+//        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+//        List<Map<String, String>> data = new ArrayList<>();
+//
+//        Cursor cursor = db.query(
+//                DBHelper.TABLE_ITEM_SERIAL,        // The table to query
+//                mAllColumns,       // The array of columns to return (pass null to get all)
+//                DBHelper.COL_SERIALNUM + "=?",                          // The array of columns to return (pass null to get all)
+//                new String[] { (serial) },                         // The columns for the WHERE clause
+//                null,                                                        // The values for the WHERE clause
+//                null,                                                        // don't group the rows
+//                null,                                                        // don't filter by row groups
+//                null);                                                       // The sort order
+//        if (cursor != null)
+//            cursor.moveToFirst();
+//        datanum.put("Serial",cursor.getString(0));
+//        datanum.put("Serialnum",cursor.getString(1));
+//
+//        data.add(datanum);
+//        cursor.close();
+//        return data;
+//    }
+    public  List<ItemSerials> getSavedSerials(String serial) {
+        datanum = new HashMap<>();
+        List<ItemSerials> SavedSerialList = new ArrayList<>();
+
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        List<Map<String, String>> data = null;
-        data = new ArrayList<Map<String, String>>();
-        Cursor cursor = db.query(
-                DBHelper.TABLE_ITEM_SERIAL,        // The table to query
-                mAllColumns,       // The array of columns to return (pass null to get all)
-                DBHelper.COLUMN_SERIAL + "=?",                          // The array of columns to return (pass null to get all)
-                new String[] { (serial) },                         // The columns for the WHERE clause
-                null,                                                        // The values for the WHERE clause
-                null,                                                        // don't group the rows
-                null,                                                        // don't filter by row groups
-                null);                                                       // The sort order
+
+        // Select All Query
+        String selectQuery = "SELECT * FROM " + DBHelper.TABLE_ITEM_SERIAL +" WHERE VoucherSerial = "+ "'"+serial+"'";
+
+
+        Cursor cursor = db.rawQuery(selectQuery, null);                                                    // The sort order
         if (cursor != null)
-            cursor.moveToFirst();
+            if (cursor.moveToFirst()) {
+                do {
 
-        datanum.put("Serialnum",cursor.getString(1));
+                    ItemSerials item = new ItemSerials();
+                    item.setSerial(cursor.getString(0));
+                    String ItemID = cursor.getString(1);
+                    item.setSerialNum(cursor.getString(2));
 
-        data.add(datanum);
+                    ItemsInOutL_DAO dao = new ItemsInOutL_DAO(mContext);
+                    ItemsInOutL itemsInOutL = dao.getItemByItemID(ItemID);
+                    if (itemsInOutL != null)
+                        item.setmID(itemsInOutL);
+                    // Adding contact to list
+                    SavedSerialList.add(item);
 
-        return data;
+
+                }while (cursor.moveToNext());
+        cursor.close();
+        }
+        return SavedSerialList;
     }
-
 
     private ItemSerials cursorToItemserial(Cursor cursor) {
         ItemSerials item = new ItemSerials();

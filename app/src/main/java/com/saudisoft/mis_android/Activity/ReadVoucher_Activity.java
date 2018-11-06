@@ -33,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class ReadVoucher_Activity extends AppCompatActivity implements  DatePickerFragment.DateDialogListener,View.OnClickListener {
@@ -46,6 +47,7 @@ public class ReadVoucher_Activity extends AppCompatActivity implements  DatePick
     private EditText voucherDateEditText;
     private static final String DIALOG_DATE = "DialogDate";
 //    private Button Vsave_btn;
+    String VoucherDate;
     ListView LV_Voucher;
     List<ItemsInOutH> voucherlist;
     List<String> VoucherHdr_list;
@@ -151,13 +153,13 @@ public class ReadVoucher_Activity extends AppCompatActivity implements  DatePick
                 SelectedItems = ItemHeader_DAO.getAllItemheader();
                 SelectedDetails=ItemDetail_DAO.GetAllItemDetails();
 //                SelectedSerials=ItemSerial_DAO.GetAllItemSerials();
-                Selected_serials=ItemSerial_DAO.getAllItemSerials();
+//                Selected_serials=ItemSerial_DAO.getAllItemSerials();
                 Intent i=new Intent(ReadVoucher_Activity.this, Voucher_DataEntryActivity.class);
                 this.finish();
                 //14- send all temp list to Voucher data entry  Activity to view it
                 i.putExtra("Header",  (Serializable) SelectedItems);
                 i.putExtra("Details", (Serializable) SelectedDetails);
-                i.putExtra("Serials", (Serializable) Selected_serials);
+//                i.putExtra("Serials", (Serializable) Selected_serials);
                 startActivity(i);
 
             }
@@ -177,9 +179,9 @@ else {
 
     }
     private void initViews() {
-        voucherDateEditText = (EditText) findViewById(R.id.edit_text_start_date);
+        voucherDateEditText =  findViewById(R.id.edit_text_start_date);
 //        calendarImage = (ImageView) findViewById(R.id.image_view_start_date);
-        LV_Voucher = (ListView) findViewById(R.id.list_vouchers);
+        LV_Voucher =  findViewById(R.id.list_vouchers);
         this.ItemHeader_DAO = new ItemInOutH_DAO(this);
         this.ItemDetail_DAO = new ItemsInOutL_DAO(this);
         this.ItemSerial_DAO = new ItemsSerials_DAO(this);
@@ -187,9 +189,9 @@ else {
         voucherDateEditText.setOnClickListener(this);
         List<Settings> settings = Setting_DAO.getAllSettings1();
         for (Settings cn : settings) {
-            Branchname= cn.getBranchCode().toString();
-            DBname = cn.getDatabaseName().toString();
-            DBserver= cn.getServerName().toString();
+            Branchname= cn.getBranchCode();
+            DBname = cn.getDatabaseName();
+            DBserver= cn.getServerName();
         }
         this. new_data = new CRUD_Operations(DBname,DBserver);
 //        Vsave_btn = (Button) findViewById(R.id.save_vouchers_btn);
@@ -216,9 +218,9 @@ else {
     }
 
     public String formatDate(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-        String VoucherDate = sdf.format(date);
-        return VoucherDate;
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
+        return  VoucherDate = sdf.format(date);
+
     }
 
     @Override
@@ -248,8 +250,9 @@ else {
         LV_Voucher.setAdapter(adapter);
 
 
-        if (new_data.isSuccess != false) {
-        } else
+        if (new_data.isSuccess)
+            Toast.makeText(ReadVoucher_Activity.this, "connection success", Toast.LENGTH_SHORT).show();
+        else
             Toast.makeText(ReadVoucher_Activity.this, new_data.exString, Toast.LENGTH_SHORT).show();
 
     }

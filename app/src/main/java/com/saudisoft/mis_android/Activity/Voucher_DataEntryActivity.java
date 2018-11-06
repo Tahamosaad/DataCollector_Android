@@ -37,9 +37,10 @@ public class Voucher_DataEntryActivity extends AppCompatActivity  {
 //    private CheckBox chkbox;
     String serialnum,mid;
     List<ItemsInOutH> headerList;
-    List<ItemSerials> select_detail;
+    List<ItemSerials> saved_serials;
     Button Add_serial;
     EditText input;
+    int listitemcount;
     TextView listcount,listcount2;
     List<Map<String,String>> Selected_serials,select_details;
     List<ItemSerials> serialsList;
@@ -56,13 +57,13 @@ public class Voucher_DataEntryActivity extends AppCompatActivity  {
         this.ItemHeader_DAO = new ItemInOutH_DAO(this);
         this.ItemDetail_DAO = new ItemsInOutL_DAO(this);
         this.ItemSerial_DAO = new ItemsSerials_DAO(this);
-        Header_LV = (ListView) findViewById(R.id.voucher_hdr);
-        Details_LV = (ListView) findViewById(R.id.voucher_dtl);
-        Serials_LV = (ListView) findViewById(R.id.serials_list);
-        input = (EditText) findViewById(R.id.txt_serial);
-        listcount2 =(TextView) findViewById(R.id.TV_count3) ;
+        Header_LV =  findViewById(R.id.voucher_hdr);
+        Details_LV =  findViewById(R.id.voucher_dtl);
+        Serials_LV =  findViewById(R.id.serials_list);
+        input =  findViewById(R.id.txt_serial);
+        listcount2 = findViewById(R.id.TV_count3) ;
 
-        Add_serial = (Button) findViewById(R.id.btn_addserial);
+        Add_serial =  findViewById(R.id.btn_addserial);
         //disable view keybad on activity
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             input.setShowSoftInputOnFocus(false);
@@ -84,10 +85,10 @@ public class Voucher_DataEntryActivity extends AppCompatActivity  {
             headerList = (List<ItemsInOutH>) getIntent().getSerializableExtra("Header");
         adapter = new GridListAdapter(Voucher_DataEntryActivity.this, headerList, false );
         Header_LV.setAdapter(adapter);
-        listcount = (TextView)findViewById(R.id.TV_count1) ;
-        listcount.setText(headerList.size()+"");
-///**************
-//*this button is temporary for mobile version
+        listcount = findViewById(R.id.TV_count1) ;
+        listcount.setText(getlistcount(Header_LV));
+    ///*****************************************************************************
+    //region : this button is temporary for mobile version
         Add_serial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -102,7 +103,8 @@ public class Voucher_DataEntryActivity extends AppCompatActivity  {
 
             }
         });
-        //*
+        //endregion
+        //*********************************************************************
 
         //3. set on voucher header list click view the voucher details on other view list
         Header_LV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -121,6 +123,7 @@ public class Voucher_DataEntryActivity extends AppCompatActivity  {
                 int[] viewswhere1 = { R.id.voucher_ID_txt, R.id.voucher_serial1_txt,R.id.Part_No_txt,R.id.Item_Name_txt,R.id.Item_Code_txt,R.id.voucher_QTY_txt};
                 SimpleAdapter itemsAdapter =  new SimpleAdapter(Voucher_DataEntryActivity.this, select_details,R.layout.voucher_dtl_layout, fromwhere1, viewswhere1);
                 Details_LV.setAdapter(itemsAdapter);
+
                 //read from text and inserted it  to list view.
                 input.addTextChangedListener(new TextWatcher() {
                     @Override
@@ -144,9 +147,12 @@ public class Voucher_DataEntryActivity extends AppCompatActivity  {
                             if (lastCharacter == '\n') {
                                 String barcode = s.subSequence(0, s.length() - 1).toString();
                                 if(!barcode.isEmpty()){
-                                    Serials_LV.setSelection(Serials_LV.getCount());
+
                                     addToList(barcode);
                                     input.requestFocus();
+                                    Serials_LV.setSelection(Serials_LV.getCount());
+
+                                    listcount2.setText(getlistcount(Serials_LV));//show the list count
                                 }
 
                             }
@@ -157,7 +163,7 @@ public class Voucher_DataEntryActivity extends AppCompatActivity  {
 
 //                Log.i("Item", "Selected: " + hdr.getSerial());
 
-//        adapter = new GridListAdapter(Voucher_DataEntryActivity.this, serialsList, false );
+//                  adapter = new GridListAdapter(Voucher_DataEntryActivity.this, serialsList, false );
 //        ArrayAdapter<ItemsInOutL> itemsAdapter =
 //                new ArrayAdapter<ItemsInOutL>(Voucher_DataEntryActivity.this,R.layout.voucher_dtl_layout,R.id.voucher_serial1_txt, select_details);
      }
@@ -168,19 +174,28 @@ public class Voucher_DataEntryActivity extends AppCompatActivity  {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
-//                if (serialsList.size() !=0){
-//                ItemsInOutL dtl =  (ItemsInOutL) Details_LV.getItemAtPosition(position);
-//                    ItemSerials srl = new ItemSerials();
-//                Selected_serials= ItemSerial_DAO.getDetailSerials("JJi100001");
-//                    for (int i = 0; i < serialsList.size(); i ++) {
-//                       String x = serialsList.get(i).getSerial();
-//                    }
-//                String[] fromwhere = {"Serialnum"};
-//                int[] viewswhere = { R.id.voucher_serials_txt};
-//                SimpleAdapter serialsAdapter =  new SimpleAdapter(Voucher_DataEntryActivity.this, Selected_serials,R.layout.list_ltem, fromwhere, viewswhere);
-//                Serials_LV.setAdapter(serialsAdapter);}
-            }
+                if (Serials_LV.getCount()<1){
+                saved_serials= ItemSerial_DAO.getSavedSerials(serialnum);
+                  if(saved_serials.size()>0) {
+                      for (int i = 0; i < saved_serials.size(); i ++) {
+                          String Savedserial = saved_serials.get(i).getSerial();
+                          addToList(Savedserial);
+                          arrayadapter.notifyDataSetChanged();
+
+                          input.setText(""); // Clear the input
+                          listcount2.setText(getlistcount(Serials_LV));//show the list count
+
+                          Serials_LV.setAdapter(arrayadapter);
+
+                      }
+//                      String[] fromwhere = {"Serial"};
+//                      int[] viewswhere = {R.id.voucher_serials_txt};
+//                      SimpleAdapter serialsAdapter = new SimpleAdapter(Voucher_DataEntryActivity.this, Selected_serials, R.layout.list_ltem, fromwhere, viewswhere);
+//                      Serials_LV.setAdapter(serialsAdapter);
+                  }else Toast.makeText(getApplicationContext(), "No Serials found", Toast.LENGTH_SHORT).show();
+                } }
             });
+
     }
 
     @Override
@@ -189,7 +204,7 @@ public class Voucher_DataEntryActivity extends AppCompatActivity  {
         return super.onCreateOptionsMenu(menu);
     }
 
-    // handle button activities
+    // handle add serials button activities
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -198,6 +213,7 @@ public class Voucher_DataEntryActivity extends AppCompatActivity  {
             return super.onOptionsItemSelected(item);
         }
         if(Serials_LV.getCount()>0) {
+            VoucherSerial_list.clear();
             // add all inserted serials to VoucherSerial_list
             if (id == R.id.add_serial_btn) {
                 for (int i = 0; i < arrayadapter.getCount(); i++) {
@@ -205,7 +221,7 @@ public class Voucher_DataEntryActivity extends AppCompatActivity  {
                     VoucherSerial_list.add(obj.toString());
                 }
 
-                for (int i = 0; i < VoucherSerial_list.size(); i++) {
+                for (int i = 0; i <= VoucherSerial_list.size(); i++) {
 
                     //10- save Serials in Locally serial table
                     ItemSerial_DAO.addItemSerials(new ItemSerials(VoucherSerial_list.get(i), serialnum, mid));
@@ -214,9 +230,9 @@ public class Voucher_DataEntryActivity extends AppCompatActivity  {
                 Toast.makeText(this, "New Serials has been Saved Successfully", Toast.LENGTH_SHORT).show();
                 Details_LV.setAdapter(null);
                 Serials_LV.setAdapter(null);
-//              select_detail= ItemSerial_DAO.getAllItemSerials();
+//              saved_serials= ItemSerial_DAO.getAllItemSerials();
                 newserial.clear();
-                listcount2.setText(newserial.size()+"");
+                listcount2.setText("0");
 
             }
         } else
@@ -224,14 +240,16 @@ public class Voucher_DataEntryActivity extends AppCompatActivity  {
             return super.onOptionsItemSelected(item);
     }
 
-
+// add to serial list new item
     public void addToList(String barcode) {
        if(!barcode.isEmpty()){
-
-           arrayadapter = new ArrayAdapter<String>(this,R.layout.list_ltem,R.id.voucher_serials_txt,newserial);
            newserial.add(barcode);
+           arrayadapter = new ArrayAdapter<>(this,R.layout.list_ltem,R.id.voucher_serials_txt,newserial);
+
+           listcount2.setText(getlistcount(Serials_LV));//show the list count
+           input.requestFocus();
            Serials_LV.setSelection(Serials_LV.getCount());
-           listcount2.setText(newserial.size()+"");
+
        }
      }
     @Override
@@ -241,8 +259,8 @@ public class Voucher_DataEntryActivity extends AppCompatActivity  {
         startActivity(intent);
         finish(); // Destroy activity A and not exist in Back stack
     }
-    private void getItemDetail(){
-
-
+    private String getlistcount(ListView Ls){
+     listitemcount= Ls.getCount();
+        return listitemcount+"";
     }
 }

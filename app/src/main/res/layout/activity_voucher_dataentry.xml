@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -17,18 +17,18 @@
             android:id="@+id/TV_Header1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="2dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/vouchers"
             android:textColor="@color/colorPrimary"
-            android:textSize="16sp"
             android:textStyle="bold"
             android:layout_weight="1"
+            android:paddingLeft="2dp"
 
             />
         <TextView
             android:id="@+id/TV_count1"
             android:padding="2dp"
-            android:text="0"
+            android:text="@string/zero"
             android:textColor="@color/colorPrimary"
             android:textSize="16sp"
             />
@@ -56,12 +56,12 @@
         android:id="@+id/TV_Header2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="2dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="@string/voucher_dtl"
         android:layout_below="@+id/list_card_view"
         android:textColor="@color/colorPrimary"
-        android:textSize="16sp"
         android:textStyle="bold"
+        android:paddingLeft="2dp"
         />
     <android.support.v7.widget.CardView
         android:id="@+id/detail_card_view"
@@ -71,13 +71,13 @@
         android:layout_height="wrap_content"
         card_view:cardCornerRadius="2dp"
         android:layout_below="@+id/TV_Header2"
-        android:layout_marginTop="6dp">
+        android:layout_marginTop="0dp">
 
         <ListView
             android:id="@+id/voucher_dtl"
             android:layout_width="match_parent"
             android:layout_height="150dp"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="0dp"
             android:dividerHeight="1dp" />
     </android.support.v7.widget.CardView>
     <TableLayout
@@ -85,21 +85,22 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/detail_card_view"
-        android:padding="2dp">
+        >
         <TableRow>
         <TextView
             android:id="@+id/TV_Header3"
             android:layout_weight="1"
-            android:padding="2dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/serials"
             android:textColor="@color/colorPrimary"
-            android:textSize="16sp"
             android:textStyle="bold"
+            android:paddingLeft="2dp"
+
             />
         <TextView
             android:id="@+id/TV_count3"
             android:padding="2dp"
-            android:text="0"
+            android:text="@string/zero"
             android:textColor="@color/colorPrimary"
             android:textSize="16sp"
             />
@@ -119,19 +120,21 @@
             android:id="@+id/serials_list"
             android:layout_width="match_parent"
             android:layout_height="70dp"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="0dp"
             android:dividerHeight="1dp"
-            android:transcriptMode="normal"/>
+            android:transcriptMode="normal"
+            android:linksClickable="true"/>
 
     </android.support.v7.widget.CardView>
     <EditText
-    android:id="@+id/txt_serial"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+        android:id="@+id/txt_serial"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:hint="@string/serial_number"
-    android:inputType="number"
-    android:textAppearance="?android:attr/textAppearance"
-    android:textColor="@android:color/black"
+        android:inputType="number"
+        android:maxLines="1"
+        android:textAppearance="?android:attr/textAppearance"
+        android:textColor="@android:color/black"
         android:layout_below="@+id/serial_card_view"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -141,7 +144,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/txt_serial"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="0dp"
         android:gravity="center"
 
         android:text="@string/save"

@@ -47,11 +47,21 @@
         <activity android:name=".Activity.InitializeDataBaseActivity" />
         <activity
             android:name=".Activity.ReadVoucher_Activity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:label="@string/read_voucher_title"
+            />
+
         <activity
             android:name=".Activity.Voucher_DataEntryActivity"
-            android:screenOrientation="portrait"></activity>
-        <activity android:name=".Activity.SendDataToMIS"></activity>
+            android:screenOrientation="portrait"
+            android:label="@string/data_entry_title"
+
+            />
+        <activity
+            android:name=".Activity.SendDataToMIS"
+            android:screenOrientation="portrait"
+            android:label="@string/send_data_title"
+        />
     </application>
 
 </manifest>

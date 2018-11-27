@@ -13,45 +13,24 @@ import java.sql.SQLException;
  */
 
 public class ConnectionHelper {
-
+    // Declaring Server ip, username, database name and password
     String ip,db,DBUserNameStr,DBPasswordStr;
 
-
+    //this is connection helper constructor with two parameter server name and db name
+    // note :must add db name and password for more security
     public ConnectionHelper(String dbname,String dbserver) {
         this.ip =dbserver;
         this.db =dbname;
+        //region user option to make db username and server static
+        //for more secure it must taken from user as db name and server name
+        this.DBUserNameStr = "sa";
+       this.DBPasswordStr = "MSSTSandURV1";
+        //endregion
     }
-
-    public String getIp() {
-        return ip;
-        }
-
-    public void setIp(String ip) {
-            this.ip = ip;
-        }
-
 
     @SuppressLint("NewApi")
     public Connection connectionclasss( )
     {
-
-
-        // Declaring Server ip, username, database name and password
-//        ip ="41.131.19.20";
-//        ip = "172.16.0.48";
-//        ip = "10.0.2.2";
-//        ip ="41.131.19.22";
-//        List<Settings> settings = DB.getAllSettings1();
-//
-//        for (Settings cn : settings) {
-//           db = cn.getDatabaseName();
-//
-//        }
-//        db = "JEDMISDB";
-        DBUserNameStr = "sa";
-        DBPasswordStr = "MSSTSandURV1";
-        // Declaring Server ip, username, database name and password
-
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);

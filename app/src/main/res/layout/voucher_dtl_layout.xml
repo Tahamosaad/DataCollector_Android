@@ -11,7 +11,8 @@
         android:layout_height="wrap_content"
         android:padding="5dp"
         >
-        <TableRow>
+        <TableRow         android:visibility="gone"
+            >
 
 
             <TextView android:text="@string/voucher_serial"/>
@@ -30,7 +31,9 @@
                 />
 
         </TableRow>
-        <TableRow>
+        <TableRow
+            android:visibility="gone"
+            >
             <TextView android:text="@string/voucher_ID"/>
             <TextView android:text="@string/double_dot"/>
 
@@ -53,7 +56,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:maxLines="3"
                 android:text="@string/ItemName"
                 android:textColor="@android:color/black"
                 />

@@ -2,10 +2,14 @@
     <string name="app_name">MIS Mobile Data Collector</string>
 
     <string name="data_entry">Voucher and serial DataEntry</string>
+    <string name="data_entry_title">Collect Serials</string>
     <string name="send_data">Send Data To MIS</string>
+    <string name="send_data_title">Send Data</string>
     <string name="read_voucher">Read Voucher from MIS</string>
+    <string name="read_voucher_title">Read Voucher</string>
     <string name="voucher_serial">Voucher Serial</string>
     <string name="vouchers">Vouchers</string>
+    <string name="voucher_hdr">Voucher Header</string>
     <string name="voucher_dtl">Voucher Details</string>
     <string name="voucher_date">Voucher Date</string>
     <string name="QTY">QTY</string>

@@ -28,7 +28,6 @@ import com.saudisoft.mis_android.Model.Settings;
 import com.saudisoft.mis_android.R;
 import com.saudisoft.mis_android.adapter.GridListAdapter;
 
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -150,15 +149,15 @@ public class ReadVoucher_Activity extends AppCompatActivity implements  DatePick
                     }
                 }
                 //13-Get all saved table and save it on temp list
-                SelectedItems = ItemHeader_DAO.getAllItemheader();
-                SelectedDetails=ItemDetail_DAO.GetAllItemDetails();
+//                SelectedItems = ItemHeader_DAO.getAllItemheader();
+//                SelectedDetails=ItemDetail_DAO.GetAllItemDetails();
 //                SelectedSerials=ItemSerial_DAO.GetAllItemSerials();
 //                Selected_serials=ItemSerial_DAO.getAllItemSerials();
                 Intent i=new Intent(ReadVoucher_Activity.this, Voucher_DataEntryActivity.class);
                 this.finish();
                 //14- send all temp list to Voucher data entry  Activity to view it
-                i.putExtra("Header",  (Serializable) SelectedItems);
-                i.putExtra("Details", (Serializable) SelectedDetails);
+//                i.putExtra("Header",  (Serializable) SelectedItems);
+//                i.putExtra("Details", (Serializable) SelectedDetails);
 //                i.putExtra("Serials", (Serializable) Selected_serials);
                 startActivity(i);
 
@@ -179,9 +178,9 @@ else {
 
     }
     private void initViews() {
-        voucherDateEditText =  findViewById(R.id.edit_text_start_date);
+        voucherDateEditText = (EditText) findViewById(R.id.edit_text_start_date);
 //        calendarImage = (ImageView) findViewById(R.id.image_view_start_date);
-        LV_Voucher =  findViewById(R.id.list_vouchers);
+        LV_Voucher = (ListView) findViewById(R.id.list_vouchers);
         this.ItemHeader_DAO = new ItemInOutH_DAO(this);
         this.ItemDetail_DAO = new ItemsInOutL_DAO(this);
         this.ItemSerial_DAO = new ItemsSerials_DAO(this);
@@ -251,7 +250,7 @@ else {
 
 
         if (new_data.isSuccess)
-            Toast.makeText(ReadVoucher_Activity.this, "connection success", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ReadVoucher_Activity.this, "Data Loaded success", Toast.LENGTH_SHORT).show();
         else
             Toast.makeText(ReadVoucher_Activity.this, new_data.exString, Toast.LENGTH_SHORT).show();
 
@@ -273,5 +272,11 @@ else {
         }}else
             Toast.makeText(this,"Please Check your Network Connection !", Toast.LENGTH_SHORT).show();
 
+    }
+    @Override
+    public void onBackPressed() {
+//        moveTaskToBack(true);
+        startActivity(new Intent(ReadVoucher_Activity.this, MainActivity.class));
+        this.finish(); // Destroy activity A and not exist in Back stack
     }
 }

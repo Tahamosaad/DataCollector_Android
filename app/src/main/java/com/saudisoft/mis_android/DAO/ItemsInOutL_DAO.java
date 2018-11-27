@@ -102,13 +102,13 @@ public class ItemsInOutL_DAO {
         if (cursor != null)
             cursor.moveToFirst();
 
-        ItemsInOutL itemdtl = new ItemsInOutL(cursor.getString(0), cursor.getString(1), cursor.getString(2), cursor.getFloat(3),cursor.getString(4),cursor.getString(5));
+//        ItemsInOutL itemdtl = new ItemsInOutL(cursor.getString(0), cursor.getString(1), cursor.getString(2), cursor.getFloat(3),cursor.getString(4),cursor.getString(5));
         // return ItemsInOutL
         datanum.put("ID",cursor.getString(0));
         datanum.put("Serial",cursor.getString(4));
-        datanum.put("PartNo",cursor.getString(5));
+        datanum.put("PartNo",cursor.getString(2));
         datanum.put("Itemname",cursor.getString(1));
-        datanum.put("ItemCode",cursor.getString(2));
+        datanum.put("ItemCode",cursor.getString(5));
         datanum.put("QTY",cursor.getString(3));
         data.add(datanum);
 

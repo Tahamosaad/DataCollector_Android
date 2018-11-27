@@ -71,10 +71,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     {
         this.db = new InvTransTypes_DAO(this);
         this.Setting_DAO = new Setting_DAO(this);
-        DataEntry_btn=findViewById(R.id.button_data_entry);
-        SendData_btn=findViewById(R.id.button_send_data);
-        ReadVoucher_btn=findViewById(R.id.button_read_voucher);
-        Exit_btn=findViewById(R.id.button_exit);
+        DataEntry_btn= (Button) findViewById(R.id.button_data_entry);
+        SendData_btn= (Button) findViewById(R.id.button_send_data);
+        ReadVoucher_btn= (Button) findViewById(R.id.button_read_voucher);
+        Exit_btn= (Button) findViewById(R.id.button_exit);
         DataEntry_btn.setOnClickListener(this);
         SendData_btn.setOnClickListener(this);
         ReadVoucher_btn.setOnClickListener(this);
@@ -171,16 +171,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     @Override
     public void onClick(View v) {
-        if(v==DataEntry_btn)
+        if(v==DataEntry_btn) {
             startActivity(new Intent(this, Voucher_DataEntryActivity.class));
+        this.finish();
+        }
         if(v==SendData_btn)
-        if (isNetworkAvailable())
+        if (isNetworkAvailable()) {
             startActivity(new Intent(this, SendDataToMIS.class));
-        else
+        this.finish();
+        }else
             Toast.makeText(this,"Please Check your connection", Toast.LENGTH_SHORT).show();
         if(v==ReadVoucher_btn)
-            if (isNetworkAvailable())
+            if (isNetworkAvailable()){
             startActivity(new Intent(this, ReadVoucher_Activity.class));
+                this.finish();
+            }
         else
             Toast.makeText(this,"Please Check your connection", Toast.LENGTH_SHORT).show();
 

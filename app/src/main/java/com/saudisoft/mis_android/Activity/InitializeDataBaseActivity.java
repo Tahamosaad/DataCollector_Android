@@ -53,9 +53,9 @@ public class InitializeDataBaseActivity extends Activity implements View.OnClick
         this.TransType_DAO = new InvTransTypes_DAO(this);
         this.ItemDir_DAO = new ItemsDirectory_DAO(this);
         this.setting_dao = new Setting_DAO(this);
-        this.mTxtUsername = (EditText) findViewById(R.id.txt_user_name_DB);
-        this.mTXTPassword = (EditText) findViewById(R.id.txt_password_DB);
-        this.btn_loginDB = (Button) findViewById(R.id.btn_loginDB);
+        this.mTxtUsername =  findViewById(R.id.txt_user_name_DB);
+        this.mTXTPassword = findViewById(R.id.txt_password_DB);
+        this.btn_loginDB =  findViewById(R.id.btn_loginDB);
         this.btn_loginDB.setOnClickListener(this);
         List<Settings> settings = setting_dao.getAllSettings1();
         for (Settings cn : settings) {

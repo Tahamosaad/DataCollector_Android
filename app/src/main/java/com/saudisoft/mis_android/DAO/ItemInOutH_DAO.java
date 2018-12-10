@@ -11,7 +11,9 @@ import com.saudisoft.mis_android.Model.InvTransTypes;
 import com.saudisoft.mis_android.Model.ItemsInOutH;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by taha.mosaad on 30/07/2018.
@@ -19,7 +21,7 @@ import java.util.List;
 
 public class ItemInOutH_DAO {
     public static final String TAG = "ItemInOutH_DAO";
-
+    Map<String,String> datanum;
     // Database fields
     private SQLiteDatabase mDatabase;
     private DBHelper mDbHelper;
@@ -43,7 +45,7 @@ public class ItemInOutH_DAO {
         }
     }
 
-    public void open() throws SQLException {
+    private void open() throws SQLException {
         mDatabase = mDbHelper.getWritableDatabase();
     }
 
@@ -97,9 +99,39 @@ public class ItemInOutH_DAO {
         mDatabase.delete(DBHelper.TABLE_ITEM_HEADER, DBHelper.COLUMN_ITEM_SERIAL
                 + " = " + id, null);
     }
+    public  List<Map<String,String>> getItemHeader(String serial) {
+        datanum = new HashMap<>();
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        List<Map<String, String>> data = new ArrayList<>();
+        Cursor cursor = db.query(
+                DBHelper.TABLE_ITEM_HEADER,        // The table to query
+                mAllColumns,       // The array of columns to return (pass null to get all)
+                DBHelper.COL_SERIAL + "=?",                          // The array of columns to return (pass null to get all)
+                new String[] { (serial) },                         // The columns for the WHERE clause
+                null,                                                        // The values for the WHERE clause
+                null,                                                        // don't group the rows
+                null,                                                        // don't filter by row groups
+                null);                                                       // The sort order
+        if (cursor != null)
+            cursor.moveToFirst();
 
+//        ItemsInOutL itemdtl = new ItemsInOutL(cursor.getString(0), cursor.getString(1), cursor.getString(2), cursor.getFloat(3),cursor.getString(4),cursor.getString(5));
+        // return ItemsInOutL
+
+        assert cursor != null;
+        datanum.put("item_serial",cursor.getString(0));
+        datanum.put("trans_num",cursor.getString(1));
+        datanum.put("trans_type",cursor.getString(2));
+        datanum.put("trans_date",cursor.getString(3));
+        datanum.put("note",cursor.getString(4));
+        datanum.put("is_new",cursor.getString(5));
+        datanum.put("TransCode",cursor.getString(6));
+        data.add(datanum);
+        cursor.close();
+        return data;
+    }
     public List<ItemsInOutH> getAllItemsInOutH() {
-        List<ItemsInOutH> listItemsInOutHs = new ArrayList<ItemsInOutH>();
+        List<ItemsInOutH> listItemsInOutHs = new ArrayList<>();
 
         Cursor cursor = mDatabase.query(DBHelper.TABLE_ITEM_HEADER, mAllColumns,
                 null, null, null, null, null);
@@ -115,7 +147,7 @@ public class ItemInOutH_DAO {
         return listItemsInOutHs;
     }
     public List<ItemsInOutH> getAllItemheader() {
-        List<ItemsInOutH> contactList = new ArrayList<ItemsInOutH>();
+        List<ItemsInOutH> contactList = new ArrayList<>();
         // Select All Query
         String selectQuery = "SELECT * FROM " + DBHelper.TABLE_ITEM_HEADER;
 
@@ -158,7 +190,7 @@ public class ItemInOutH_DAO {
         return affectedRows > 0;
     }
     public List<ItemsInOutH> getItemsInOutHOfTrans(String  Transcode) {
-        List<ItemsInOutH> listItemsInOutH = new ArrayList<ItemsInOutH>();
+        List<ItemsInOutH> listItemsInOutH = new ArrayList<>();
 
         Cursor cursor = mDatabase.query(DBHelper.TABLE_ITEM_HEADER, mAllColumns,
                 DBHelper.COLUMN_mTransCode + " = ?",
@@ -182,8 +214,7 @@ public class ItemInOutH_DAO {
         if (cursor != null) {
             cursor.moveToFirst();
         }
-        ItemsInOutH item = cursorToItemHdr (cursor);
-        return item;
+        return cursorToItemHdr (cursor);
     }
 
     private ItemsInOutH cursorToItemHdr(Cursor cursor) {

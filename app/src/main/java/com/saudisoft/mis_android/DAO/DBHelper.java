@@ -58,7 +58,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	// Table Columns
 	public static final String COL_ID = "ID";
 	public static final String COL_SERIALNUM = "SerialNum";
-	public static final String COLUMN_SERIAL = "VoucherSerial";
+	public static final String COL_VSERIAL = "VoucherSerial";
 
 	// Table ItemsDirectory
 	public static final String TABLE_ITEM_DIRECTORY = "ItemsDirectory";
@@ -128,7 +128,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	public static final String SQL_CREATE_TABLE_ITEM_SERIAL = "CREATE TABLE IF NOT EXISTS "+TABLE_ITEM_SERIAL+" ( " +
 			COL_SERIALNUM + " TEXT NOT NULL PRIMARY KEY," +
 			COL_ID + " TEXT NOT NULL," +
-			COLUMN_SERIAL + " TEXT );";
+			COL_VSERIAL + " TEXT );";
 	// Create Table Statement
 	public static final String SQL_CREATE_TABLE_ITEM_DIRECTORY = "CREATE TABLE IF NOT EXISTS "+TABLE_ITEM_DIRECTORY+" ( " +
 			COL_ITEMCODE + " TEXT NOT NULL PRIMARY KEY ," +

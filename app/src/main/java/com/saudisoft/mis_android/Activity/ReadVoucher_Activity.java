@@ -108,7 +108,7 @@ public class ReadVoucher_Activity extends AppCompatActivity implements  DatePick
                         String selectedRowLabel = Serial_List.get(selectedRows.keyAt(i));
 
                         //append the row label text
-                        stringBuilder.append("'"+selectedRowLabel +"'"+ ",");
+                        stringBuilder.append("'").append(selectedRowLabel).append("'").append(",");
 
 
 //                        Selected_item.add(selectedRowLabel);
@@ -136,7 +136,7 @@ public class ReadVoucher_Activity extends AppCompatActivity implements  DatePick
                 VoucherSerial_list =new_data.SelectedVoucherSerial(serials);
                 for (int i = 0; i < VoucherSerial_list.size(); i += 3) {
                     for (int j = i; j <= i; j += 3) {
-                        //10- save Serials in Locally serial table
+                        //10- savemenu Serials in Locally serial table
                         ItemSerial_DAO.addItemSerials(new ItemSerials(VoucherSerial_list.get(j), VoucherSerial_list.get(j +1),VoucherSerial_list.get(j +2)));
                     }
                 }
@@ -144,11 +144,11 @@ public class ReadVoucher_Activity extends AppCompatActivity implements  DatePick
                 VoucherHdr_list =new_data.SelectedVoucherHdr(serials);
                 for (int i = 0; i < VoucherHdr_list.size(); i += 5) {
                     for (int j = i; j <= i; j += 5) {
-                        //12- save Voucher Header in Locally serial table
+                        //12- savemenu Voucher Header in Locally serial table
                         ItemHeader_DAO.addItemHeader(new ItemsInOutH(VoucherHdr_list.get(j), VoucherHdr_list.get(j +1), VoucherHdr_list.get(j + 2), VoucherHdr_list.get(j +3), VoucherHdr_list.get(j + 4),0));
                     }
                 }
-                //13-Get all saved table and save it on temp list
+                //13-Get all saved table and savemenu it on temp list
 //                SelectedItems = ItemHeader_DAO.getAllItemheader();
 //                SelectedDetails=ItemDetail_DAO.GetAllItemDetails();
 //                SelectedSerials=ItemSerial_DAO.GetAllItemSerials();
@@ -193,6 +193,7 @@ else {
             DBserver= cn.getServerName();
         }
         this. new_data = new CRUD_Operations(DBname,DBserver);
+        voucherDateEditText.setText( new_data.GetServerDate());
 //        Vsave_btn = (Button) findViewById(R.id.save_vouchers_btn);
 //        Vsave_btn.setOnClickListener(this);
 //        voucherDateEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -241,7 +242,7 @@ else {
                 ItemHeader_DAO.addItemHeader(new ItemsInOutH(VoucherHdr_list.get(j), VoucherHdr_list.get(j + 1), VoucherHdr_list.get(j + 2), VoucherHdr_list.get(j + 3), "", 0));
             }
         }
-        //3- Get Local Voucher and save it in temp list voucherlist
+        //3- Get Local Voucher and savemenu it in temp list voucherlist
         voucherlist = ItemHeader_DAO.getAllItemheader();
         //4- view it as list view to make user select from it
         adapter = new GridListAdapter(ReadVoucher_Activity.this, voucherlist, true);

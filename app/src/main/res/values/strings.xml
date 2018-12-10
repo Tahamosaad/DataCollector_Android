@@ -2,9 +2,10 @@
     <string name="app_name">MIS Mobile Data Collector</string>
 
     <string name="data_entry">Voucher and serial DataEntry</string>
-    <string name="data_entry_title">Collect Serials</string>
+    <string name="data_entry_title">My Vouchers</string>
     <string name="send_data">Send Data To MIS</string>
     <string name="send_data_title">Send Data</string>
+    <string name="add_serial_title">Serials Collector</string>
     <string name="read_voucher">Read Voucher from MIS</string>
     <string name="read_voucher_title">Read Voucher</string>
     <string name="voucher_serial">Voucher Serial</string>
@@ -22,10 +23,12 @@
     <string name="serials">Serials</string>
     <string name="serial_number">Serial number</string>
 
-    Voucher Serial
-    <string name="init_db">Initialize DataBase</string>
+        <string name="init_db">Initialize DataBase</string>
     <string name="system_setting">System Setting</string>
     <string name="Exit">Exit</string>
+    <string name="close">Close</string>
+    <string name="cancel">Cancel</string>
+
     <string name="settings">Setting</string>
     <string name="choose_menu">Choose a Menu Option</string>
     <string name="first_name">First name</string>
@@ -63,4 +66,10 @@
     <string name="delete">Delete</string>
     <string name="company_deleted_successfully">Company deleted successfully</string>
     <string name="employee_deleted_successfully">Employee deleted successfully</string>
+    <string name="analog_key_mode_output">Analog Key Mode Output</string>
+    <string name="broadcast_mode_output">Broadcast Mode Output</string>
+    <string name="direct_fill_mode_output">Direct Fill Mode Output</string>
+    <string name="broadcast_output_result_display_area">scanner display area</string>
+    <string name="result_display_area_of_analog_key_output">result display area of Scanner </string>
+    <string name="empty">Clear All</string>
 </resources>

@@ -17,7 +17,6 @@ import com.saudisoft.mis_android.Model.ItemsDirectory;
 import com.saudisoft.mis_android.Model.Settings;
 import com.saudisoft.mis_android.R;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class InitializeDataBaseActivity extends Activity implements View.OnClickListener{
@@ -36,18 +35,15 @@ public class InitializeDataBaseActivity extends Activity implements View.OnClick
 
     }
     public boolean Checkuser() {
-
-        List<String> MyData = null;
-
         String userName = mTxtUsername.getText().toString();
         String password = mTXTPassword.getText().toString();
 
-        MyData = new_data.SelectUsers(userName,password);
-        if(!(MyData.size()<1)){
-        if (!userName.equalsIgnoreCase(MyData.get(0).toString())||!password.equals(MyData.get(1).toString())) {
-            return false;
-        } else return true;}
-        else return false;
+        List<String> MyData = new_data.SelectUsers(userName,password);
+        return((MyData.size()>1));
+//        if (!userName.equalsIgnoreCase(MyData.get(0).toString())||!password.equals(MyData.get(1).toString())) {
+//            return false;
+
+
     }
     private void initViews() {
         this.TransType_DAO = new InvTransTypes_DAO(this);
@@ -59,8 +55,8 @@ public class InitializeDataBaseActivity extends Activity implements View.OnClick
         this.btn_loginDB.setOnClickListener(this);
         List<Settings> settings = setting_dao.getAllSettings1();
         for (Settings cn : settings) {
-            DBNAME= cn.getDatabaseName().toString();
-            DBserver = cn.getServerName().toString();
+            DBNAME= cn.getDatabaseName();
+            DBserver = cn.getServerName();
         }
         this. new_data = new CRUD_Operations(DBNAME,DBserver);
     }
@@ -68,10 +64,6 @@ public class InitializeDataBaseActivity extends Activity implements View.OnClick
     // Set data in local database with data loaded from MIS Database
     private void Set_data()
     {
-
-
-        List<String> TransValues =new ArrayList<String>();;
-        List<String> Itemslist =new ArrayList<String>();
 
 //
 //        List<Map<String,String>> MyData = null; // return array of select query values
@@ -84,8 +76,8 @@ public class InitializeDataBaseActivity extends Activity implements View.OnClick
 //                TransValues.add(value);
 //            }
 //   }
-        TransValues=new_data.SelectTrans();
-        Itemslist= new_data.SelectItems();
+        List<String> TransValues=new_data.SelectTrans();
+        List<String> Itemslist= new_data.SelectItems();
         for  (int i=0;i< TransValues.size();i+=4)
         {
             for(int j=i;j<=i;j+=4) {
@@ -111,7 +103,7 @@ public class InitializeDataBaseActivity extends Activity implements View.OnClick
     @Override
     public void onClick(View v) {
         if(v==btn_loginDB){
-            if (Checkuser() != false)
+            if (Checkuser())
             {
                 Set_data();
                 Toast.makeText(this,"Database has been initialized Successfully", Toast.LENGTH_SHORT).show();

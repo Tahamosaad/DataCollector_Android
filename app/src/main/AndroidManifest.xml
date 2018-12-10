@@ -62,6 +62,11 @@
             android:screenOrientation="portrait"
             android:label="@string/send_data_title"
         />
+        <activity
+            android:name=".Activity.AddSerials"
+            android:screenOrientation="portrait"
+            android:label="@string/add_serial_title"
+            />
     </application>
 
 </manifest>

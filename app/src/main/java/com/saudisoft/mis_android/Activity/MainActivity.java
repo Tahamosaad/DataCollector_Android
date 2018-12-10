@@ -1,17 +1,21 @@
 package com.saudisoft.mis_android.Activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.saudisoft.mis_android.DAO.InvTransTypes_DAO;
@@ -27,9 +31,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button DataEntry_btn,SendData_btn,ReadVoucher_btn,Exit_btn;
     private InvTransTypes_DAO db;
     private Setting_DAO Setting_DAO;
+    private EditText mUsername,mPassword;
     List<Settings> setting;
     CRUD_Operations new_data;
     private  String DBNAME,DBserver;
+     boolean status;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,8 +85,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SendData_btn.setOnClickListener(this);
         ReadVoucher_btn.setOnClickListener(this);
         Exit_btn.setOnClickListener(this);
-
-
         this.setting = Setting_DAO.getAllSettings1();
         for (Settings cn : setting) {
             DBNAME= cn.getDatabaseName();
@@ -163,6 +167,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onStart();
         ChkInvTransData();
 
+
     }
     @Override
     protected void onDestroy() {
@@ -172,18 +177,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         if(v==DataEntry_btn) {
-            startActivity(new Intent(this, Voucher_DataEntryActivity.class));
-        this.finish();
+            createAndShowDialog(Voucher_DataEntryActivity.class);
         }
         if(v==SendData_btn)
         if (isNetworkAvailable()) {
-            startActivity(new Intent(this, SendDataToMIS.class));
-        this.finish();
+            createAndShowDialog(SendDataToMIS.class);
         }else
             Toast.makeText(this,"Please Check your connection", Toast.LENGTH_SHORT).show();
         if(v==ReadVoucher_btn)
             if (isNetworkAvailable()){
-            startActivity(new Intent(this, ReadVoucher_Activity.class));
+            startActivity(new Intent(MainActivity.this, ReadVoucher_Activity.class));
                 this.finish();
             }
         else
@@ -199,5 +202,68 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+    private void createAndShowDialog( final Class<? extends Activity> ActivityToOpen)
+    {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        // Get the layout inflater
+        LayoutInflater inflater = this.getLayoutInflater();
+        // Inflate and set the layout for the dialog
+        View v = inflater.inflate( R.layout.login_dialog, null );
+        // Pass null as the parent view because its going in the dialog layout
+        v.findViewById( R.id.panel );
+        builder.setView( v );
+        mUsername =  v.findViewById(R.id.username);
+        mPassword = v.findViewById(R.id.password);
+        // Add the buttons
+        builder.setPositiveButton( R.string.login, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked login button
+                if (Checkuser())
+                {
+                    startActivity(new Intent(MainActivity.this, ActivityToOpen));
+                    MainActivity.this.finish();
+                }
+                else
+                    Toast.makeText(MainActivity.this,"Incorrect user name or password !", Toast.LENGTH_SHORT).show();
+            }
+        } );
+        builder.setNegativeButton(R.string.cancel,new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked cancel button
+                if (isAlertDialogShowing((AlertDialog) dialog)) {
+                    dialog.dismiss();
+                }
+
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+    public boolean Checkuser() {
+
+        String userName = mUsername.getText().toString();
+        String password = mPassword.getText().toString();
+        List<String> MyData = new_data.SelectUsers(userName, password);
+        return (MyData.size() > 1) && Save();
+    }
+    public boolean isAlertDialogShowing(AlertDialog thisAlertDialog) {
+        return thisAlertDialog != null && thisAlertDialog.isShowing();
+    }
+    public  boolean Save()
+    {
+        //user_data = mydata , Mode_private => use data only on my app
+        SharedPreferences sharedPreferences = getSharedPreferences( "User_data", Context.MODE_PRIVATE );
+        //edit my data which i get
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        //put string take two value(Key ,value)
+        editor.putString("name", mUsername.getText().toString());
+        editor.putString( "password",mPassword.getText().toString());
+        return editor.commit();
+//        editor.apply();
     }
 }

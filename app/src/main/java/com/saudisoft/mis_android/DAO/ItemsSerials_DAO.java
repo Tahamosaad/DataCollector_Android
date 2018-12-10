@@ -26,7 +26,7 @@ public class ItemsSerials_DAO {
     private SQLiteDatabase mDatabase;
     private DBHelper mDbHelper;
     private Context mContext;
-//    private String[] mAllColumns = {DBHelper.COLUMN_SERIAL,DBHelper.COL_SERIALNUM, DBHelper.COL_ID};
+//    private String[] mAllColumns = {DBHelper.COL_VSERIAL,DBHelper.COL_SERIALNUM, DBHelper.COL_ID};
     private Map<String,String> datanum;
 
     public ItemsSerials_DAO(Context context) {
@@ -49,23 +49,39 @@ public class ItemsSerials_DAO {
         mDbHelper.close();
     }
     public void addItemSerials(ItemSerials serials) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        if (!mDatabase.isOpen())
+            open();
         ItemsInOutL_DAO dao = new ItemsInOutL_DAO(mContext);
         ItemsInOutL Dtl = dao.getItemByItemID(serials.getmItemID());
-
         ContentValues values = new ContentValues();
-        values.put(DBHelper.COLUMN_SERIAL, serials.getSerialNum());
+        values.put(DBHelper.COL_VSERIAL, serials.getSerialNum());
         values.put(DBHelper.COL_SERIALNUM,serials.getSerial() );
         values.put(DBHelper.COL_ID, Dtl.getID());
         // Inserting Row
-        db.insert(DBHelper.TABLE_ITEM_SERIAL, null, values);
-        db.close(); // Closing database connection
+        mDatabase.insert(DBHelper.TABLE_ITEM_SERIAL, null, values);
+        mDatabase.close(); // Closing database connection
     }
-    public void deleteItemSerials(ItemSerials item) {
-        String id = item.getSerial();
-        System.out.println("the deleted item has the id: " + id);
-        mDatabase.delete(DBHelper.TABLE_ITEM_SERIAL, DBHelper.COLUMN_ITEM_SERIAL
-                + " = " + id, null);
+    // Updating single setting
+    public int updateSerials(ItemSerials serials) {
+        if (!mDatabase.isOpen())
+            open();
+        ItemsInOutL_DAO dao = new ItemsInOutL_DAO(mContext);
+        ItemsInOutL Dtl = dao.getItemByItemID(serials.getmItemID());
+        ContentValues values = new ContentValues();
+        values.put(DBHelper.COL_SERIALNUM, serials.getSerial());
+        values.put(DBHelper.COL_VSERIAL, serials.getSerialNum());
+        values.put(DBHelper.COL_ID, Dtl.getID());
+        // updating row
+        int isupdated=mDatabase.update(DBHelper.TABLE_ITEM_SERIAL, values, DBHelper.COL_VSERIAL + " = ?", new String[] {serials.getSerialNum()});
+       mDatabase.close();
+        return isupdated;
+    }
+    public int deleteItemSerials(ItemSerials serials) {
+        if (!mDatabase.isOpen())
+            open();
+       int isdeleted=   mDatabase.delete(DBHelper.TABLE_ITEM_SERIAL,DBHelper.COL_ID+" = ? "+" and "+DBHelper.COL_SERIALNUM+" = ? ",new String[]{serials.getmItemID(),serials.getSerial()});
+        mDatabase.close();
+        return isdeleted;
     }
     public List<ItemSerials> getAllItemSerials() {
         List<ItemSerials> contactList = new ArrayList<>();
@@ -205,8 +221,11 @@ public class ItemsSerials_DAO {
     }
     // todo DELETE all table
     public boolean deleteTable() {
-        SQLiteDatabase database = mDbHelper.getReadableDatabase();
-        int affectedRows = database.delete(DBHelper.TABLE_ITEM_SERIAL, null, null);
+//        SQLiteDatabase database = mDbHelper.getReadableDatabase();
+        if (!mDatabase.isOpen())
+            open();
+        int affectedRows = mDatabase.delete(DBHelper.TABLE_ITEM_SERIAL, null, null);
+        mDatabase.close();
         return affectedRows > 0;
     }
 }

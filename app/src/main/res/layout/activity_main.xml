@@ -1,17 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/DrawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:orientation="vertical"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context=".Activity.MainActivity"
-    android:gravity="center_horizontal">
+    android:elevation="7dp"
+    tools:targetApi="lollipop"
 
+    >
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        tools:context=".Activity.MainActivity"
+        >
+        <android.support.design.widget.AppBarLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+          >
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+        </android.support.design.widget.AppBarLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:orientation="vertical"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:paddingBottom="@dimen/activity_vertical_margin">
     <TextView
+        android:visibility="gone"
         android:text="@string/choose_menu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -23,42 +54,120 @@
         android:textStyle="bold"
         android:textColor="@color/AccentDark"
          />
-    <Button
-        android:id="@+id/button_read_voucher"
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:textSize="@dimen/large_text"
-        android:background="@color/colorPrimaryLight"
-        android:text="@string/read_voucher"
-        android:layout_marginBottom="10dp"/>
-    <Button
-        android:id="@+id/button_data_entry"
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:textSize="@dimen/large_text"
-        android:background="@color/colorPrimaryLight"
-        android:layout_marginBottom="10dp"
-        android:text="@string/data_entry"/>
 
-    <Button
-        android:id="@+id/button_send_data"
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:textSize="@dimen/large_text"
-        android:background="@color/colorPrimaryLight"
-        android:text="@string/send_data"/>
+    <TableLayout
 
+        android:id="@+id/row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <TableRow>
+
+            <RelativeLayout
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+
+                >
+
+                <ImageView
+                    android:id="@+id/thumbnail"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/album_cover_height"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
+                    android:contentDescription=""
+                    android:src="@mipmap/ic_import_data" />
+
+                <Button
+                    android:id="@+id/button_read_voucher"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/thumbnail"
+
+                    android:background="@android:color/transparent"
+                    android:text="@string/read_voucher"
+                    android:textSize="@dimen/large_text"
+
+                    />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp">
+
+                <ImageView
+                    android:id="@+id/thumbnail3"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/album_cover_height"
+                    android:foregroundGravity="center"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:src="@mipmap/ic_send_data" />
+
+                <Button
+
+                    android:id="@+id/button_send_data"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/thumbnail3"
+                    android:background="@android:color/transparent"
+                    android:gravity="center"
+                    android:text="@string/send_data"
+                    android:textSize="@dimen/large_text" />
+            </RelativeLayout>
+
+        </TableRow>
+    </TableLayout>
+
+    <RelativeLayout
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="70dp"
+        android:layout_marginRight="20dp">
+
+        <ImageView
+            android:id="@+id/thumbnail2"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@mipmap/ic_scanner"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
+
+        <Button
+            android:id="@+id/button_data_entry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:text="@string/data_entry"
+            android:textSize="@dimen/large_text"
+            android:layout_below="@+id/thumbnail2"
+            />
+    </RelativeLayout>
 
 
     <Button
         android:id="@+id/button_exit"
         android:layout_width="match_parent"
         android:textSize="@dimen/large_text"
-        android:layout_height="50dp"
-        android:layout_marginTop="70dp"
-
+        android:layout_height="30dp"
+        android:layout_marginTop="5dp"
         android:background="@color/colorAccent"
         android:text="@string/Exit"/>
-
-</LinearLayout>
+        </LinearLayout>
+    </android.support.design.widget.CoordinatorLayout>
+<android.support.design.widget.NavigationView
+android:id="@+id/navigation_view"
+android:layout_height="match_parent"
+android:layout_width="wrap_content"
+android:layout_gravity="start"
+app:headerLayout="@layout/nav_header"
+app:menu="@menu/drawer">
+</android.support.design.widget.NavigationView>
+</android.support.v4.widget.DrawerLayout>
 

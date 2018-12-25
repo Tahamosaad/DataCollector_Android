@@ -1,13 +1,17 @@
 package com.saudisoft.mis_android.Activity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,7 +23,6 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.nlscan.android.scan.ScanManager;
 import com.saudisoft.mis_android.DAO.ItemInOutH_DAO;
 import com.saudisoft.mis_android.DAO.ItemsInOutL_DAO;
 import com.saudisoft.mis_android.DAO.ItemsSerials_DAO;
@@ -35,24 +38,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.saudisoft.mis_android.R.id.txt_serial;
-
 public class Voucher_DataEntryActivity extends AppCompatActivity {
     public static final String TAG = "Voucher_DataEntry";
+    private final String DEFAULT = "N/A";
     public ListView Header_LV,Details_LV,Serials_LV;
     ArrayAdapter<String> arrayadapter;
-    String serialnum,mid,MISUser;
-    String[] new_serial;
-    private final String DEFAULT = "N/A";
-    private ScanManager mScanMgr;
+    String serialnum,mid,MISUser,mQty;
     Set<String> not_repeated_serial;
     ArrayList<String> repeated_serial= new ArrayList<>();
     List<ItemsInOutH> headerList;
     List<ItemSerials> saved_serials;
-    FloatingActionButton Add_serial;
-    EditText input;
+    List<Map<String,String>> item_serials;
+     boolean result;
+    FloatingActionButton btn_reset;
+    EditText scanner_input;
     int listitemcount;
-    TextView listcount,listcount2;
+    TextView listcount,listcount2,tv_count;
     List<Map<String,String>> select_details;
 //    ArrayList<String> VoucherSerial_list =  new ArrayList<>();
     ArrayList<String> newserial = new ArrayList<>();
@@ -70,20 +71,24 @@ public class Voucher_DataEntryActivity extends AppCompatActivity {
         Header_LV = (ListView) findViewById(R.id.voucher_hdr);
         Details_LV = (ListView) findViewById(R.id.voucher_dtl);
         Serials_LV = (ListView) findViewById(R.id.serials_list);
-        input = (EditText) findViewById(txt_serial);
         listcount2 = (TextView) findViewById(R.id.TV_count3);
-        Add_serial = (FloatingActionButton) findViewById(R.id.btn_addserial);
-//        mScanMgr=ScanManager.getInstance();
-//        mScanMgr.setOutpuMode(ScanSettings.Global.VALUE_OUT_PUT_MODE_FILLING);
-        //region disable view keybad on activity
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            input.setShowSoftInputOnFocus(false);
-        else
-            input.setTextIsSelectable(true);
-//endregion
+        tv_count=(TextView)findViewById(R.id.tv_count1);
+        btn_reset = (FloatingActionButton) findViewById(R.id.btn_reset);
+        scanner_input = (EditText) findViewById(R.id.txt_serial);
+
         //load data from saved shared preferences to this activity
-        SharedPreferences get = getSharedPreferences( "User_data",MODE_PRIVATE );
-        MISUser= get.getString("name",DEFAULT) ;
+        SharedPreferences UN = getSharedPreferences( "User_data",MODE_PRIVATE );
+        MISUser= UN.getString("name",DEFAULT) ;
+//        SharedPreferences VD = getSharedPreferences( "voucher_data",MODE_PRIVATE );
+//        serialnum=VD.getString("Vserial",DEFAULT);
+//        mid=VD.getString("Vid",DEFAULT);
+//        if(serialnum!=null&&mid !=null){
+//            select_details= ItemDetail_DAO.getItemDetails(serialnum);
+//            String[] fromwhere1 = {"ID","Serial","PartNo","Itemname","ItemCode","QTY"};
+//            int[] viewswhere1 = { R.id.voucher_ID_txt, R.id.voucher_serial1_txt,R.id.Part_No_txt,R.id.Item_Name_txt,R.id.Item_Code_txt,R.id.voucher_QTY_txt};
+//            SimpleAdapter itemsAdapter =  new SimpleAdapter(Voucher_DataEntryActivity.this, select_details,R.layout.voucher_dtl_layout, fromwhere1, viewswhere1);
+//            Details_LV.setAdapter(itemsAdapter);
+//        }
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,48 +98,57 @@ public class Voucher_DataEntryActivity extends AppCompatActivity {
         initViews();
         // Get HeaderList from Intent
         //2. get (selected vouchers Header) from previous activity or locally
-        if( getIntent().getSerializableExtra("Header") ==null)
+        if( ItemHeader_DAO.getAllItemheader() !=null)
             headerList =ItemHeader_DAO.getAllItemheader();
         else
             Toast.makeText(getApplicationContext(), "No Voucher Selected", Toast.LENGTH_SHORT).show();
-//            headerList = (List<ItemsInOutH>) getIntent().getSerializableExtra("Header");
+//     headerList = (List<ItemsInOutH>) getIntent().getSerializableExtra("Header");
         adapter = new GridListAdapter(Voucher_DataEntryActivity.this, headerList, false );
         Header_LV.setAdapter(adapter);
         listcount =(TextView) findViewById(R.id.TV_count1) ;
         listcount.setText(getlistcount(Header_LV));
     ///*****************************************************************************
+       //region load data from add serial activity
         if(getIntent().getStringArrayListExtra("Serials") !=null)
-        {newserial = getIntent().getStringArrayListExtra("Serials");
+        {
+        newserial = getIntent().getStringArrayListExtra("Serials");
         arrayadapter = new ArrayAdapter<>(this,R.layout.list_ltem,R.id.voucher_serials_txt,newserial);
         arrayadapter.notifyDataSetChanged();
-            Serials_LV.setAdapter(arrayadapter);
-            listcount2.setText(getlistcount(Serials_LV));//show the list count
-            Serials_LV.setSelection(Serials_LV.getCount());// restore the position of listview
-             }
-        //region : this button is temporary for mobile version
-        Add_serial.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                startActivity(new Intent(Voucher_DataEntryActivity.this, AddSerials.class));
-                Intent i=new Intent(Voucher_DataEntryActivity.this, AddSerials.class);
-                Voucher_DataEntryActivity.this.finish();
-                //send all serial list to serial entry Activity to view it
-                i.putExtra("CurrentSerials",newserial);
-                startActivity(i);
-//                addToList(input.getText().toString());
-//                 arrayadapter.notifyDataSetChanged();
+        Serials_LV.setAdapter(arrayadapter);
+        listcount2.setText(getlistcount(Serials_LV));//show the list count
+        Serials_LV.setSelection(Serials_LV.getCount());// restore the position of listview
+        }
+       //endregion
+        //region disable view keybad on activity
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            scanner_input.setShowSoftInputOnFocus(false);
+        else
+            scanner_input.setTextIsSelectable(true);
+//		//endregion
+      //region  add new serials button
+//        Add_serial.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if(serialnum!=null&& mQty!= null){
+//                SharedPreferences sharedPreferences = getSharedPreferences( "voucher_data", Context.MODE_PRIVATE );
+//                //edit my data which i get
+//                SharedPreferences.Editor editor = sharedPreferences.edit();
+//                //put string take two value(Key ,value)
+//                editor.putString("Vserial",serialnum );
+//                editor.putString( "Vid",mid);
+//                editor.putString("Vqty",mQty);
+//                editor.apply();
+//                Intent i=new Intent(Voucher_DataEntryActivity.this, AddSerials.class);
+//                Voucher_DataEntryActivity.this.finish();
+//                //send all serial list to serial entry Activity to view it
+//                i.putExtra("CurrentSerials",newserial);
+//                startActivity(i);}
+//                else Toast.makeText(Voucher_DataEntryActivity.this,"Please Select Any voucher", Toast.LENGTH_SHORT).show();
 //
-//                input.setText(""); // Clear the input
-//
-//                Serials_LV.setAdapter(arrayadapter);
-//                // restore the position of listview
-//                Serials_LV.setSelection(Serials_LV.getCount());
-
-            }
-        });
-        //endregion
+//            }
+//        });
+//        endregion
         //*********************************************************************
-
         //3. set on voucher header list click view the voucher details on other view list
         // region view selected voucher detail data
         Header_LV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -142,17 +156,18 @@ public class Voucher_DataEntryActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
+
 //                String main = Header_LV.getSelectedItem().toString();
                 ItemsInOutH hdr = (ItemsInOutH) Header_LV.getItemAtPosition(position);
                 select_details= ItemDetail_DAO.getItemDetails(hdr.getSerial());
                 serialnum = select_details.get(0).get("Serial");
-                mid = select_details.get(0).get("ID");
+//                mid = select_details.get(position).get("ID");
 
                 String[] fromwhere1 = {"ID","Serial","PartNo","Itemname","ItemCode","QTY"};
                 int[] viewswhere1 = { R.id.voucher_ID_txt, R.id.voucher_serial1_txt,R.id.Part_No_txt,R.id.Item_Name_txt,R.id.Item_Code_txt,R.id.voucher_QTY_txt};
                 SimpleAdapter itemsAdapter =  new SimpleAdapter(Voucher_DataEntryActivity.this, select_details,R.layout.voucher_dtl_layout, fromwhere1, viewswhere1);
                 Details_LV.setAdapter(itemsAdapter);
-
+                view.setSelected(true);
      }});
 //endregion
         //region view selected voucher serial in serial list
@@ -162,15 +177,23 @@ public class Voucher_DataEntryActivity extends AppCompatActivity {
 
                 Serials_LV.setAdapter(null);
                 ClearList();
-                saved_serials= ItemSerial_DAO.getSavedSerials(serialnum);
+                mid = select_details.get(position).get("ID");
+                mQty= select_details.get(position).get("QTY");
+//                item_serials= ItemSerial_DAO.getItemSerials(mid);
+                saved_serials= ItemSerial_DAO.getSavedSerials(mid);
                   if(saved_serials.size()>0) {
                       for (int i = 0; i < saved_serials.size(); i ++) {
                           addToList(saved_serials.get(i).getSerial());
                       }
 
                   }else Toast.makeText(getApplicationContext(), "No Serials found", Toast.LENGTH_SHORT).show();
-                 }
+                view.setSelected(true);
+                tv_count.setText(mQty);
+                view.setSelected(true);
+
+            }
             });
+
         //endregion
         //region view selected serial on input text view
         Serials_LV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -181,37 +204,6 @@ public class Voucher_DataEntryActivity extends AppCompatActivity {
             }
         });
         //endregion
-        //region (Edit text) read from text and inserted it  to list view.
-        input.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                if( -1 != input.getText().toString().indexOf( "\n" ) ){
-//                    input.setText("Enter was pressed!");
-//                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-//                if (s.length() > 0)
-//                {
-//                    char lastCharacter = s.charAt(s.length() - 1);
-//                    if (lastCharacter == '\n')
-//                    {
-//                        String barcode = s.subSequence(0, s.length() - 1).toString();
-//                        if(!input.getText().toString().isEmpty())
-//                            addToList(input.getText().toString());
-//                    }
-
-//                }
-            }
-        });
-        //endregion
-
         SwipeDismissListViewTouchListener touchListener =
         new SwipeDismissListViewTouchListener( Serials_LV,new SwipeDismissListViewTouchListener.DismissCallbacks() {
                             @Override
@@ -242,6 +234,63 @@ public class Voucher_DataEntryActivity extends AppCompatActivity {
                             }
                         });
         Serials_LV.setOnTouchListener(touchListener);
+        btn_reset.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                ClearList();
+
+            }
+        });
+//		region (Edit text) read from text and inserted it  to list view.
+        scanner_input.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                if( -1 != input.getText().toString().indexOf( "\n" ) ){
+//                    input.setText("Enter was pressed!");
+//                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(!s.toString().isEmpty())
+                {	char lastCharacter = s.charAt(s.length() - 1);
+                    if (lastCharacter == '\n' || lastCharacter == '\r')
+                    {
+                        String barcode ;
+                        barcode=s.toString().replaceAll("(\\r|\\n|\\t)", "");
+                        if( Integer.valueOf(getlistcount(Serials_LV))< Integer.valueOf(mQty) )
+                        {
+                            if (checkrepet(barcode)){
+                                if (barcode.length() > 0)
+                                {
+//							char lastCharacter = s.charAt(s.length() - 1);
+//							if (lastCharacter == '\n')
+//							{
+//                                  barcode = s.subSequence(0, s.length() - 1).toString();
+
+                                    addToList(barcode);
+//								    tv_count1.setText(scanner_input.getLineCount()+"");
+                                }
+//							}
+                            }else	{
+                                Toast.makeText(Voucher_DataEntryActivity.this, "Serial :"+s.toString() +"Repeated", Toast.LENGTH_SHORT).show();
+                                scanner_input.getText().clear();
+                            }
+
+                        }else	{
+                            Toast.makeText(Voucher_DataEntryActivity.this, "Max Serial Is :"+mQty, Toast.LENGTH_SHORT).show();
+                            scanner_input.getText().clear();
+                        }
+                    }
+                }}
+        });
+//		endregion
     }
 
     @Override
@@ -249,7 +298,6 @@ public class Voucher_DataEntryActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.savemenu, menu);
         return super.onCreateOptionsMenu(menu);
     }
-
     // handle add serials button activities
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -259,87 +307,118 @@ public class Voucher_DataEntryActivity extends AppCompatActivity {
             return super.onOptionsItemSelected(item);
         }
         if(Serials_LV.getCount()>0) {
-
             // add all inserted serials to VoucherSerial_list
             if (id == R.id.save_serial_btn) {
-             if(SaveSerials()){
-                 Toast.makeText(this, "New Serials has been Saved Successfully", Toast.LENGTH_SHORT).show();
-                 Details_LV.setAdapter(null);
-                 Serials_LV.setAdapter(null);
-                 newserial.clear();
-                 input.setText("");
-                 listcount2.setText(getlistcount(Serials_LV));
-             } else
-                 Toast.makeText(this, "Saved Failed", Toast.LENGTH_SHORT).show();
-
+                SaveDialog();
             }
-        } else
-            Toast.makeText(this, "Please Enter Serial", Toast.LENGTH_LONG).show();
+
+        } else Toast.makeText(this, "Please Enter Serial", Toast.LENGTH_SHORT).show();
             return super.onOptionsItemSelected(item);
     }
-
 // add to serial list new item
     public void addToList(String barcode) {
         if(!barcode.isEmpty()){
             newserial.add(barcode);
             arrayadapter = new ArrayAdapter<>(this,R.layout.list_ltem,R.id.voucher_serials_txt,newserial);
             arrayadapter.notifyDataSetChanged();
-            input.requestFocus();
-//            input.setText(""); // Clear the input
             Serials_LV.setAdapter(arrayadapter);
             listcount2.setText(getlistcount(Serials_LV));//show the list count
             Serials_LV.setSelection(Serials_LV.getCount());// restore the position of listview
         }
+        scanner_input.getText().clear();
     }
-    public void ClearList() {
 
-            newserial.clear();
-            arrayadapter = new ArrayAdapter<>(this,R.layout.list_ltem,R.id.voucher_serials_txt,newserial);
-            arrayadapter.notifyDataSetChanged();
-            input.requestFocus();
-            input.setText(""); // Clear the input
-            Serials_LV.setAdapter(arrayadapter);
-            listcount2.setText(getlistcount(Serials_LV));//show the list count
-            Serials_LV.setSelection(Serials_LV.getCount());// restore the position of listview
+    private  void SaveDialog() {
+        if(arrayadapter.getCount()< Integer.valueOf(mQty)){
+            AlertDialog alertDialog = new AlertDialog.Builder(this)
+                //set icon
+                .setIcon(R.drawable.ic_alert)
+                //set title
+                .setTitle("Validation Alert ")
+                //set message
+                .setMessage("Serials Number are less than the QTY of voucher details \n Save any way ? ")
+                //set positive button
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        //set what would happen when positive button is clicked
+                        //10- save or update Serials in Locally serial table
+                        if (SaveSerials()) {
+                            Toast.makeText(Voucher_DataEntryActivity.this, "New Serials has been Saved Successfully", Toast.LENGTH_SHORT).show();
+                            ClearList();
+                        } else
+                            Toast.makeText(Voucher_DataEntryActivity.this, "Saved Failed", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                //set negative button
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        //set what should happen when negative button is clicked
+                        //Toast.makeText(getApplicationContext(),"Nothing Happened",Toast.LENGTH_LONG).show();
+                    }
+                }).show();
 
+        }
+        else
+        {
+            if(SaveSerials())
+            {
+                Toast.makeText(Voucher_DataEntryActivity. this, "New Serials has been Saved Successfully", Toast.LENGTH_SHORT).show();
+                ClearList();
+            } else Toast.makeText(Voucher_DataEntryActivity.this, "Saved Failed", Toast.LENGTH_SHORT).show();
+        }
     }
-    private  boolean SaveSerials(){
-        ArrayList<String> VoucherSerial_list = new ArrayList<>();
-       for (int x = 0 ; x < arrayadapter.getCount() ; x ++){
-           VoucherSerial_list.add(arrayadapter.getItem(x));
-       }
-
-        if (CheckDuplicates(VoucherSerial_list)){
-            Toast.makeText(this,"this serial is repeated" +repeated_serial.toString(), Toast.LENGTH_LONG).show();
-
-            return false;}
-         try {
-             saved_serials= ItemSerial_DAO.getSavedSerials(serialnum);
-          for (int i = 0; i < arrayadapter.getCount(); i++) {
-              //10- save or update Serials in Locally serial table
-//              if(saved_serials.size()>0)
-//              ItemSerial_DAO.updateSerials(new ItemSerials(arrayadapter.getItem(i), serialnum, mid));
-//              else
-               ItemSerial_DAO.addItemSerials(new ItemSerials(arrayadapter.getItem(i), serialnum, mid));
-           }
-//             saved_serials= ItemSerial_DAO.getSavedSerials(serialnum);
-//             return (saved_serials.size() == arrayadapter.getCount());
-return true;
-          }
-    catch (Exception ex){
-        Toast.makeText(this, ex.getMessage(), Toast.LENGTH_LONG).show();
-        return false;}
-     }
     @Override
     public void onBackPressed() {
 //        moveTaskToBack(true);
+        deleteSharedPref();
         startActivity(new Intent(Voucher_DataEntryActivity.this, MainActivity.class));
         this.finish(); // Destroy activity A and not exist in Back stack
     }
-
+    private boolean SaveSerials(){
+        try{
+        for (int i = 0; i < arrayadapter.getCount(); i++) {
+            ItemSerial_DAO.addItemSerials(new ItemSerials(serialnum,arrayadapter.getItem(i),  mid));
+        }
+        saved_serials= ItemSerial_DAO.getSavedSerials(mid);
+        return saved_serials.size()>0;
+    }catch (Exception ex){Toast.makeText(this, ex.getMessage(), Toast.LENGTH_LONG).show();
+        return false;}
+    }
+    private void deleteSharedPref(){
+//        SharedPreferences sharedPreferences = getSharedPreferences( "voucher_data", Context.MODE_PRIVATE );
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        editor.remove("Vserial");
+//        editor.remove("Vid");
+//        editor.apply();
+        PreferenceManager.getDefaultSharedPreferences(Voucher_DataEntryActivity.this).edit().clear().apply();
+    }
     //check if any repeated serials on serial list before savemenu locally
-    boolean CheckDuplicates(final ArrayList<String> serial_list)
-    {
+
+    private boolean checkrepet(String serial){
+
+        for (String i : newserial)
+        {
+            if (i.equalsIgnoreCase(serial)) return false;
+        }
+        return true;
+    }
+    private String getlistcount(ListView Ls){
+     listitemcount= Ls.getCount();
+        return listitemcount+"";
+    }
+    public void ClearList() {
+
+        newserial.clear();
+        arrayadapter = new ArrayAdapter<>(this,R.layout.list_ltem,R.id.voucher_serials_txt,newserial);
+        arrayadapter.notifyDataSetChanged();
+        Serials_LV.setAdapter(arrayadapter);
+        listcount2.setText(getlistcount(Serials_LV));//show the list count
+        Serials_LV.setSelection(Serials_LV.getCount());// restore the position of listview
+
+    }
+    boolean CheckDuplicates(final ArrayList<String> serial_list) {
         not_repeated_serial = new HashSet<>();
         for (String i : serial_list)
         {
@@ -351,78 +430,41 @@ return true;
         }
         return false;
     }
-    private String getlistcount(ListView Ls){
-     listitemcount= Ls.getCount();
-        return listitemcount+"";
-    }
+    private void createAndShowDialog( )
+    {
 
-    //region barcode listener not used yet
-    /*
-    //    @Override
-//    public boolean dispatchKeyEvent(KeyEvent KeyPressd) {
-////        if (KeyPressd.getCharacters() != null && !KeyPressd.getCharacters().isEmpty())
-//            //Add more code...
-//        KeyPressd.toString();
-////        KeyEvent { action=ACTION_DOWN, keyCode=KEYCODE_BCR_SCAN_FRONT, scanCode=744, metaState=0, flags=0x8, repeatCount=0, eventTime=132032420, downTime=132032420, deviceId=5, source=0x101 }
-//            return super.dispatchKeyEvent(KeyPressd);
-////        else
-////            return false;
-//    }
-    private BroadcastReceiver mResultReceiver=new BroadcastReceiver() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(Voucher_DataEntryActivity.this);
+        // Get the layout inflater
+        LayoutInflater inflater = this.getLayoutInflater();
+        // Inflate and set the layout for the dialog
+        View v = inflater.inflate( R.layout.login_dialog, null );
+        // Pass null as the parent view because its going in the dialog layout
+        v.findViewById( R.id.panel );
+        builder.setView( v );
 
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            IntentFilter intFilter=new IntentFilter(ScanManager.ACTION_SEND_SCAN_RESULT);
-            registerReceiver(mResultReceiver, intFilter);
-            String action=intent.getAction();
-            if(ScanManager.ACTION_SEND_SCAN_RESULT.equals(action)){
-                byte[] bvalue1=intent.getByteArrayExtra(ScanManager.EXTRA_SCAN_RESULT_ONE_BYTES);
-//                byte[] bvalue2=intent.getByteArrayExtra(ScanManager.EXTRA_SCAN_RESULT_TWO_BYTES);
-                String svalue1=null;
-//                String svalue2=null;
-                try {
-                    if(bvalue1!=null)
-                        svalue1=new String(bvalue1,"GBK");
-//                    if(bvalue2!=null)
-//                        svalue2=new String(bvalue1,"GBK");
-                    svalue1=svalue1==null?"":svalue1;
-//                    svalue2=svalue2==null?"":svalue2;
-                    input.setText(svalue1);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    input.setText("data encode failed.");
+        // Add the buttons
+        builder.setPositiveButton( R.string.login, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked login button
+
+                    Toast.makeText(Voucher_DataEntryActivity.this,"Incorrect user name or password !", Toast.LENGTH_SHORT).show();
+            }
+        } );
+        builder.setNegativeButton(R.string.cancel,new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked cancel button
+                if (isAlertDialogShowing((AlertDialog) dialog)) {
+                    dialog.dismiss();
                 }
 
-                Random random = new Random();
-                input.setTextColor(Color.argb(255, random.nextInt(256),
-                        random.nextInt(256), random.nextInt(256)));
             }
-        }
-    };
+        });
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        registerReceiver();
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    } public boolean isAlertDialogShowing(AlertDialog thisAlertDialog) {
+        return thisAlertDialog != null && thisAlertDialog.isShowing();
     }
-    private void registerReceiver()
-    {
-        IntentFilter intFilter=new IntentFilter(ScanManager.ACTION_SEND_SCAN_RESULT);
-        registerReceiver(mResultReceiver, intFilter);
-    }
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unRegisterReceiver();
-    }
-    private void unRegisterReceiver()
-    {
-        try {
-            unregisterReceiver(mResultReceiver);
-        } catch (Exception e) {
-        }
-    }
-*/
-    //endregion
-
 }

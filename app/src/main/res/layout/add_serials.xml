@@ -1,37 +1,62 @@
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.saudisoft.mis_android.Activity.AddSerials" >
-
-    <EditText 
-        android:id="@+id/et_emulator_result"
+    <TableLayout
+        android:id="@+id/serialheader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:hint="@string/result_display_area_of_analog_key_output"
-        />
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/btn_reset"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
-        android:src="@drawable/ic_delete"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="16dp"
-        layout_anchorGravity="bottom|end"/>
-    <RadioGroup
+        android:padding="2dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+        <TableRow tools:ignore="UselessParent">
+            <TextView
+                android:id="@+id/et_Header1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/serials_count"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold"
+                android:layout_weight="1"
+                android:paddingLeft="2dp"
+                android:paddingRight="2dp"
+                />
+            <TextView
+                android:id="@+id/tv_count1"
+                android:padding="2dp"
+                android:text="@string/zero"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
+                />
+            <TextView
+                android:text="@string/backslash"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
+                />
+            <TextView
+                android:id="@+id/tv_count6"
+                android:padding="2dp"
+                android:text="@string/zero"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
+                />
+        </TableRow>
+    </TableLayout>
+
+     <RadioGroup
         android:id="@+id/radio_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        android:layout_below="@id/et_emulator_result"
         android:layout_marginTop="20dip">
 
         <RadioButton
@@ -54,4 +79,66 @@
 
     </RadioGroup>
 
-</android.support.design.widget.CoordinatorLayout>
+    <android.support.v7.widget.CardView
+     android:id="@+id/serial_card"
+    card_view:elevation="6dp"
+    android:layout_gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    card_view:cardCornerRadius="2dp"
+        android:layout_below="@+id/serialheader"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <ListView
+            android:id="@+id/serial_lst"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:dividerHeight="1dp"
+            android:linksClickable="true"
+            android:transcriptMode="normal"
+            android:layout_below="@+id/serialheader"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_above="@+id/et_emulator_result" />
+
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/btn_addsrl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:src="@drawable/ic_add"
+            android:layout_marginBottom="16dp"
+            android:layout_above="@+id/btn_reset"
+            android:layout_alignLeft="@+id/btn_reset"
+            android:layout_alignStart="@+id/btn_reset" />
+
+    </android.support.v7.widget.CardView>
+    <EditText
+        android:id="@+id/et_emulator_result"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/result_display_area_of_analog_key_output"
+        android:maxLines="1"
+        android:windowSoftInputMode="stateVisible"
+        android:textAppearance="?android:attr/textAppearance"
+        android:textColor="@android:color/black"
+        android:layout_below="@+id/serial_card"
+         />
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/btn_reset"
+        layout_anchorGravity="bottom|end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_gravity="end|bottom"
+        android:src="@drawable/ic_delete"
+        android:layout_marginRight="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="12dp" />
+
+</RelativeLayout>

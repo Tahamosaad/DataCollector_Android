@@ -21,7 +21,7 @@ import java.util.Map;
 
 public class ItemInOutH_DAO {
     public static final String TAG = "ItemInOutH_DAO";
-    Map<String,String> datanum;
+    private Map<String,String> datanum;
     // Database fields
     private SQLiteDatabase mDatabase;
     private DBHelper mDbHelper;
@@ -93,11 +93,12 @@ public class ItemInOutH_DAO {
         return newItemHdr;
     }
 
-    public void deleteItemsInOutH(ItemsInOutH item) {
-        String id = item.getSerial();
-        System.out.println("the deleted item has the id: " + id);
-        mDatabase.delete(DBHelper.TABLE_ITEM_HEADER, DBHelper.COLUMN_ITEM_SERIAL
-                + " = " + id, null);
+    public int deleteItemsInOutH(ItemsInOutH item) {
+        if (!mDatabase.isOpen())
+            open();
+        int isdeleted=   mDatabase.delete(DBHelper.TABLE_ITEM_HEADER,DBHelper.COLUMN_ITEM_SERIAL+" = ? ",new String[]{item.getSerial()});
+        mDatabase.close();
+        return isdeleted;
     }
     public  List<Map<String,String>> getItemHeader(String serial) {
         datanum = new HashMap<>();
@@ -124,8 +125,8 @@ public class ItemInOutH_DAO {
         datanum.put("trans_type",cursor.getString(2));
         datanum.put("trans_date",cursor.getString(3));
         datanum.put("note",cursor.getString(4));
-        datanum.put("is_new",cursor.getString(5));
-        datanum.put("TransCode",cursor.getString(6));
+        datanum.put("is_new",cursor.getString(6));
+        datanum.put("TransCode",cursor.getString(5));
         data.add(datanum);
         cursor.close();
         return data;

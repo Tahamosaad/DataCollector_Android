@@ -40,6 +40,7 @@ public class SendDataToMIS extends AppCompatActivity {
     private ItemsInOutL_DAO ItemDetail_DAO;
     private ItemsSerials_DAO ItemSerial_DAO;
     List<ItemSerials> saved_serials;
+    List<Map<String,String>> item_serials;
     List<ItemsInOutH> headerList;
     List<Map<String, String>> headerList2;
     int listitemcount;
@@ -118,10 +119,11 @@ public class SendDataToMIS extends AppCompatActivity {
                 ItemsInOutH hdr = (ItemsInOutH) Header_LV.getItemAtPosition(position);
 
                     select_details= ItemDetail_DAO.getItemDetails(hdr.getSerial());
-                    saved_serials= ItemSerial_DAO.getSavedSerials(hdr.getSerial());
-                    serialnum = select_details.get(0).get("Serial");
-                    mid = select_details.get(0).get("ID");
-                    itemcode = select_details.get(0).get("ItemCode");
+
+                    serialnum = select_details.get(position).get("Serial");
+                    mid = select_details.get(position).get("ID");
+                    itemcode = select_details.get(position).get("ItemCode");
+                saved_serials= ItemSerial_DAO.getSavedSerials(mid);
                     headerList2 = ItemHeader_DAO.getItemHeader(serialnum);
                     mSerial = headerList2.get(0).get("item_serial");
                     TType = headerList2.get(0).get("trans_type");
@@ -143,11 +145,11 @@ public class SendDataToMIS extends AppCompatActivity {
         });
     }
     private  boolean  send_serials(){
-         if(new_data.InsertNewSerials(newserial,mid,serialnum,Tcode,Tnum,TDate,TType,itemcode,Branchcode, MISUser))
-         {for(String srl :newserial)
-             ItemSerial_DAO.deleteItemSerials(new ItemSerials(srl, serialnum, mid));
-        return true;}
-        else
+//         if(new_data.InsertNewSerials(select_details,newserial,Tcode,Tnum,TDate,TType,Branchcode, MISUser))
+//         {for(String srl :newserial)
+//             ItemSerial_DAO.deleteItemSerials(new ItemSerials(srl, serialnum, mid));
+//        return true;}
+//        else
             return false;
     }
 

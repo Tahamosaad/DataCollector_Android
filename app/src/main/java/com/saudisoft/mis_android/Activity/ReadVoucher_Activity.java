@@ -54,7 +54,7 @@ public class ReadVoucher_Activity extends AppCompatActivity implements  DatePick
     List<String> VoucherSerial_list;
     List<ItemsInOutH>        SelectedItems;
     List<Map<String,String>> SelectedSerials;
-    List<ItemSerials>        Selected_serials;
+//    List<ItemSerials>        Selected_serials;
     List<Map<String,String>> SelectedDetails;
     private GridListAdapter adapter;
     String Branchname,DBname,DBserver;
@@ -79,6 +79,9 @@ public class ReadVoucher_Activity extends AppCompatActivity implements  DatePick
     // handle button activities
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        ItemHeader_DAO.deleteTable();
+        ItemDetail_DAO.deleteTable();
+        ItemSerial_DAO.deleteTable();
         int id = item.getItemId();
 
         if (id == R.id.edit_btn) {
@@ -120,10 +123,7 @@ public class ReadVoucher_Activity extends AppCompatActivity implements  DatePick
                 String serials = Serials(stringBuilder.toString());//to remove last ','
 //                Toast.makeText(ReadVoucher_Activity.this, "Selected Rows\n" + serials, Toast.LENGTH_SHORT).show();
 
-                //6- clear all Locally (item header,item details, item serials)tables
-                ItemHeader_DAO.deleteTable();
-                ItemDetail_DAO.deleteTable();
-                ItemSerial_DAO.deleteTable();
+
                 //7- select all VoucherDetails where current selected serials
                 VoucherDtl_list =new_data.SelectedVoucherDtl(serials);
                 for (int i = 0; i < VoucherDtl_list.size(); i += 6) {
@@ -163,19 +163,13 @@ public class ReadVoucher_Activity extends AppCompatActivity implements  DatePick
 
             }
 
-        else {
-               Toast.makeText(this,"No Voucher selected", Toast.LENGTH_SHORT).show();
-               return super.onOptionsItemSelected(item);
-
-           }
+        else {Toast.makeText(this,"No Voucher selected", Toast.LENGTH_SHORT).show();
+               return super.onOptionsItemSelected(item);}
             }
-else {
-        Toast.makeText(this,"No Voucher founded", Toast.LENGTH_SHORT).show();
-            return super.onOptionsItemSelected(item);
-
-        }}
+else {Toast.makeText(this,"No Voucher founded", Toast.LENGTH_SHORT).show();
+       return super.onOptionsItemSelected(item);}
+        }
         return super.onOptionsItemSelected(item);
-
     }
     private void initViews() {
         voucherDateEditText = (EditText) findViewById(R.id.edit_text_start_date);
@@ -232,8 +226,10 @@ else {
     private void Getdata() {
 //        List<Map<String, String>> MyData = null;
 
-
+//6- clear all Locally (item header,item details, item serials)tables
         ItemHeader_DAO.deleteTable();
+        ItemDetail_DAO.deleteTable();
+        ItemSerial_DAO.deleteTable();
         //1- select top 100 of Voucher header where branchcode='j',VoucherDate='Selected Date'
         VoucherHdr_list = new_data.SelectVoucher(Branchname, voucherDateEditText.getText().toString());
         for (int i = 0; i < VoucherHdr_list.size(); i += 4) {

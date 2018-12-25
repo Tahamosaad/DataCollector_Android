@@ -21,7 +21,7 @@ import java.util.Map;
 
 public class ItemsInOutL_DAO {
     public static final String TAG = "ItemsInOutL_DAO";
-    Map<String,String> datanum;
+    private Map<String,String> datanum;
 
     // Database fields
     private SQLiteDatabase mDatabase;
@@ -58,8 +58,8 @@ public class ItemsInOutL_DAO {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 //        ItemInOutH_DAO dao = new ItemInOutH_DAO(mContext);
 //        ItemsInOutH serials = dao.getserialByItemId(item.getItemSerial());
-        ItemsDirectory_DAO dao1 = new ItemsDirectory_DAO(mContext);
-        ItemsDirectory itemDir = dao1.getItemByItemcode(item.getItemcode());
+//        ItemsDirectory_DAO dao1 = new ItemsDirectory_DAO(mContext);
+//        ItemsDirectory itemDir = dao1.getItemByItemcode(item.getItemcode());
         ContentValues values = new ContentValues();
         values.put(DBHelper.COL_ITEM_ID, item.getID());
         values.put(DBHelper.COL_ITEMNAME_DTL, item.getItemName());
@@ -80,17 +80,15 @@ public class ItemsInOutL_DAO {
         if (cursor != null) {
             cursor.moveToFirst();
         }
-        ItemsInOutL Item_id = cursorToItemsInOutL(cursor);
-        return Item_id;
+//        ItemsInOutL Item_id = cursorToItemsInOutL(cursor);
+        return cursorToItemsInOutL(cursor);
     }
 
     // Getting single Settings
     public  List<Map<String,String>> getItemDetails(String serial) {
-        datanum = new HashMap<String,String>();
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        List<Map<String, String>> data = null;
-        data = new ArrayList<Map<String, String>>();
-        Cursor cursor = db.query(
+        List<Map<String, String>> data =  new ArrayList<>();
+                Cursor cursor = db.query(
                 DBHelper.TABLE_ITEM_InOutL,        // The table to query
                 mAllColumns,       // The array of columns to return (pass null to get all)
                 DBHelper.COL_SERIAL + "=?",                          // The array of columns to return (pass null to get all)
@@ -100,22 +98,27 @@ public class ItemsInOutL_DAO {
                 null,                                                        // don't filter by row groups
                 null);                                                       // The sort order
         if (cursor != null)
-            cursor.moveToFirst();
+        {
+            if (cursor.moveToFirst()) {
 
-//        ItemsInOutL itemdtl = new ItemsInOutL(cursor.getString(0), cursor.getString(1), cursor.getString(2), cursor.getFloat(3),cursor.getString(4),cursor.getString(5));
-        // return ItemsInOutL
-        datanum.put("ID",cursor.getString(0));
-        datanum.put("Serial",cursor.getString(4));
-        datanum.put("PartNo",cursor.getString(2));
-        datanum.put("Itemname",cursor.getString(1));
-        datanum.put("ItemCode",cursor.getString(5));
-        datanum.put("QTY",cursor.getString(3));
-        data.add(datanum);
-
+             do {
+                    datanum = new HashMap<>();
+                    datanum.put("ID", cursor.getString(0));
+                    datanum.put("Itemname", cursor.getString(1));
+                    datanum.put("PartNo", cursor.getString(2));
+                    datanum.put("QTY", cursor.getString(3));
+                    datanum.put("Serial", cursor.getString(4));
+                    datanum.put("ItemCode", cursor.getString(5));
+                    data.add( datanum);
+                }
+                while (cursor.moveToNext());
+                cursor.close();
+            }
+        }
         return data;
     }
     public List<ItemsInOutL> getAllItemDetails(String serial) {
-        List<ItemsInOutL> itemsList = new ArrayList<ItemsInOutL>();
+        List<ItemsInOutL> itemsList = new ArrayList<>();
         // Select All Query
 //        String selectQuery = "SELECT * FROM " + DBHelper.TABLE_ITEM_InOutL;
 
@@ -133,14 +136,14 @@ public class ItemsInOutL_DAO {
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
-
+int i=0;
                 ItemsInOutL itemdtl = new ItemsInOutL();
-                itemdtl.setID(cursor.getString(0));
-                itemdtl.setItemSerial(cursor.getString(1));
-                itemdtl.setPartNumber(cursor.getString(2));
-                itemdtl.setItemName(cursor.getString(3));
-                itemdtl.setItemcode(cursor.getString(4));
-                itemdtl.setQty(cursor.getInt(5));
+                itemdtl.setID(cursor.getString(i));
+                itemdtl.setItemName(cursor.getString(i));
+                itemdtl.setPartNumber(cursor.getString(i));
+                itemdtl.setQty(cursor.getInt(i));
+                itemdtl.setItemSerial(cursor.getString(i));
+                itemdtl.setItemcode(cursor.getString(i));
 
 //                String Itemcode = cursor.getString(4);
 //
@@ -161,9 +164,9 @@ public class ItemsInOutL_DAO {
     }
     public List<Map<String,String>> GetAllItemDetails() {
 //        List<ItemsInOutL> itemsList = new ArrayList<ItemsInOutL>();
-        datanum = new HashMap<String,String>();
-        List<Map<String, String>> data = null;
-        data = new ArrayList<Map<String, String>>();
+        datanum = new HashMap<>();
+        List<Map<String, String>> data ;
+        data = new ArrayList<>();
         // Select All Query
         String selectQuery = "SELECT * FROM " + DBHelper.TABLE_ITEM_InOutL;
 
@@ -197,8 +200,13 @@ public class ItemsInOutL_DAO {
         // return Item dtl  list
         return data;
     }
-
-
+    public int deleteItemDetails(ItemsInOutL serials) {
+        if (!mDatabase.isOpen())
+            open();
+        int isdeleted=   mDatabase.delete(DBHelper.TABLE_ITEM_InOutL,DBHelper.COL_ITEM_ID+" = ? "+" and "+DBHelper.COL_SERIAL+" = ? ",new String[]{serials.getID(),serials.getItemSerial()});
+        mDatabase.close();
+        return isdeleted;
+    }
     // todo DELETE all table
     public boolean deleteTable() {
         SQLiteDatabase database = mDbHelper.getReadableDatabase();

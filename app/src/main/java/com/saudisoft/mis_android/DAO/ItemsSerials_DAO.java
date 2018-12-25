@@ -28,7 +28,10 @@ public class ItemsSerials_DAO {
     private Context mContext;
 //    private String[] mAllColumns = {DBHelper.COL_VSERIAL,DBHelper.COL_SERIALNUM, DBHelper.COL_ID};
     private Map<String,String> datanum;
-
+    private String[] mAllColumns = {
+            DBHelper.COL_ID,
+            DBHelper.COL_SERIALNUM,
+            DBHelper.COL_VSERIAL};
     public ItemsSerials_DAO(Context context) {
         this.mContext = context;
         mDbHelper = new DBHelper(context);
@@ -54,8 +57,8 @@ public class ItemsSerials_DAO {
         ItemsInOutL_DAO dao = new ItemsInOutL_DAO(mContext);
         ItemsInOutL Dtl = dao.getItemByItemID(serials.getmItemID());
         ContentValues values = new ContentValues();
-        values.put(DBHelper.COL_VSERIAL, serials.getSerialNum());
-        values.put(DBHelper.COL_SERIALNUM,serials.getSerial() );
+        values.put(DBHelper.COL_VSERIAL, serials.getSerial());
+        values.put(DBHelper.COL_SERIALNUM,serials.getSerialNum() );
         values.put(DBHelper.COL_ID, Dtl.getID());
         // Inserting Row
         mDatabase.insert(DBHelper.TABLE_ITEM_SERIAL, null, values);
@@ -126,27 +129,28 @@ public class ItemsSerials_DAO {
         Cursor cursor = db.rawQuery(selectQuery, null);
         List<Map<String, String>> data =new ArrayList<>();
 
-        // looping through all rows and adding to list
-        if (cursor.moveToFirst()) {
-            do {
+        if (cursor != null)
+        {
+            if (cursor.moveToFirst()) {
 
-                // Adding contact to list
-//                contactList.add(item);
+                do {
+                    datanum = new HashMap<>();
+                    datanum.put("ID", cursor.getString(2));
+                    datanum.put("SerialNum", cursor.getString(1));
+                    datanum.put("VoucherSerial", cursor.getString(0));
 
-                datanum.put("Serialnum",cursor.getString(0));
-//                datanum.put("Serial",cursor.getString(2));
-//                datanum.put("Serial_ID",cursor.getString(1));
-                data.add(datanum);
-            } while (cursor.moveToNext());
-            // make sure to close the cursor
-            cursor.close();
+                    data.add( datanum);
+                }
+                while (cursor.moveToNext());
+                cursor.close();
+            }
         }
 
         // return contact list
         return data;
     }
 
-
+//
 //    public  List<Map<String,String>> getDetailSerials(String serial) {
 //        datanum = new HashMap<>();
 //        SQLiteDatabase db = mDbHelper.getReadableDatabase();
@@ -170,31 +174,39 @@ public class ItemsSerials_DAO {
 //        cursor.close();
 //        return data;
 //    }
-    public  List<ItemSerials> getSavedSerials(String serial) {
-        datanum = new HashMap<>();
+    //
+    public  List<ItemSerials> getSavedSerials(String id) {
+//        datanum = new HashMap<>();
         List<ItemSerials> SavedSerialList = new ArrayList<>();
 
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
         // Select All Query
-        String selectQuery = "SELECT * FROM " + DBHelper.TABLE_ITEM_SERIAL +" WHERE VoucherSerial = "+ "'"+serial+"'";
+//        String selectQuery = "SELECT * FROM " + DBHelper.TABLE_ITEM_SERIAL +" WHERE ID = "+ "'"+id+"'";
 
-
-        Cursor cursor = db.rawQuery(selectQuery, null);                                                    // The sort order
+        Cursor cursor = db.query(
+                DBHelper.TABLE_ITEM_SERIAL,        // The table to query
+                mAllColumns,       // The array of columns to return (pass null to get all)
+                DBHelper.COL_ID + "=?",                          // The array of columns to return (pass null to get all)
+                new String[] { (id) },                         // The columns for the WHERE clause
+                null,                                                        // The values for the WHERE clause
+                null,                                                        // don't group the rows
+                null,                                                        // don't filter by row groups
+                null);                                                   // The sort order
         if (cursor != null)
             if (cursor.moveToFirst()) {
                 do {
 
                     ItemSerials item = new ItemSerials();
-                    item.setSerial(cursor.getString(0));
-                    String ItemID = cursor.getString(1);
+                    item.setSerial(cursor.getString(1));
+                    String ItemID = cursor.getString(0);
                     item.setSerialNum(cursor.getString(2));
 
                     ItemsInOutL_DAO dao = new ItemsInOutL_DAO(mContext);
                     ItemsInOutL itemsInOutL = dao.getItemByItemID(ItemID);
                     if (itemsInOutL != null)
                         item.setmID(itemsInOutL);
-                    // Adding contact to list
+                    // Adding  to list
                     SavedSerialList.add(item);
 
 
@@ -203,7 +215,66 @@ public class ItemsSerials_DAO {
         }
         return SavedSerialList;
     }
+    public  List<Map<String,String>> getallSerials(String vserial) {
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        List<Map<String, String>> data =  new ArrayList<>();
+        Cursor cursor = db.query(
+                DBHelper.TABLE_ITEM_SERIAL,        // The table to query
+                mAllColumns,       // The array of columns to return (pass null to get all)
+                DBHelper.COL_VSERIAL + "=?",                          // The array of columns to return (pass null to get all)
+                new String[] { (vserial) },                         // The columns for the WHERE clause
+                null,                                                        // The values for the WHERE clause
+                null,                                                        // don't group the rows
+                null,                                                        // don't filter by row groups
+                null);                                                       // The sort order
+        if (cursor != null)
+        {
+            if (cursor.moveToFirst()) {
 
+                do {
+                    datanum = new HashMap<>();
+                    datanum.put("ID", cursor.getString(0));
+                    datanum.put("SerialNum", cursor.getString(1));
+                    datanum.put("VoucherSerial", cursor.getString(2));
+
+                    data.add( datanum);
+                }
+                while (cursor.moveToNext());
+                cursor.close();
+            }
+        }
+        return data;
+    }
+    public  List<Map<String,String>> getItemSerials(String id) {
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        List<Map<String, String>> data =  new ArrayList<>();
+        Cursor cursor = db.query(
+                DBHelper.TABLE_ITEM_SERIAL,        // The table to query
+                mAllColumns,       // The array of columns to return (pass null to get all)
+                DBHelper.COL_ID + "=?",                          // The array of columns to return (pass null to get all)
+                new String[] { (id) },                         // The columns for the WHERE clause
+                null,                                                        // The values for the WHERE clause
+                null,                                                        // don't group the rows
+                null,                                                        // don't filter by row groups
+                null);                                                       // The sort order
+        if (cursor != null)
+        {
+            if (cursor.moveToFirst()) {
+
+                do {
+                    datanum = new HashMap<>();
+                    datanum.put("ID", cursor.getString(0));
+                    datanum.put("SerialNum", cursor.getString(1));
+                    datanum.put("VoucherSerial", cursor.getString(2));
+
+                    data.add( datanum);
+                }
+                while (cursor.moveToNext());
+                cursor.close();
+            }
+        }
+        return data;
+    }
     private ItemSerials cursorToItemserial(Cursor cursor) {
         ItemSerials item = new ItemSerials();
         item.setSerial(cursor.getString(0));

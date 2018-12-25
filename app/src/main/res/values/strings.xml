@@ -1,18 +1,18 @@
 <resources>
-    <string name="app_name">MIS Mobile Data Collector</string>
+    <string name="app_name">MIS Mobile</string>
 
-    <string name="data_entry">Voucher and serial DataEntry</string>
+    <string name="data_entry">SERIAL COLLECTOR</string>
     <string name="data_entry_title">My Vouchers</string>
-    <string name="send_data">Send Data To MIS</string>
+    <string name="send_data">SEND DATA</string>
     <string name="send_data_title">Send Data</string>
     <string name="add_serial_title">Serials Collector</string>
-    <string name="read_voucher">Read Voucher from MIS</string>
-    <string name="read_voucher_title">Read Voucher</string>
-    <string name="voucher_serial">Voucher Serial</string>
+    <string name="read_voucher">IMPORT Data</string>
+    <string name="read_voucher_title">Import Vouchers</string>
+    <string name="voucher_serial">Serial</string>
     <string name="vouchers">Vouchers</string>
     <string name="voucher_hdr">Voucher Header</string>
     <string name="voucher_dtl">Voucher Details</string>
-    <string name="voucher_date">Voucher Date</string>
+    <string name="voucher_date">Date</string>
     <string name="QTY">QTY</string>
     <string name="ItemName">Item Name</string>
     <string name="ItemCode">Item Code</string>
@@ -21,6 +21,12 @@
     <string name="voucher_type">Voucher Type</string>
     <string name="Trans_Code">Trans Code</string>
     <string name="serials">Serials</string>
+    <string name="serials_count">Serials Count</string>
+    <string name="About_App">About</string>
+    <string name="dialog_message">This Application is totally free and is available on Google play store</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+    <string name="donate_message">If you like this Application, please help us by Rating more places </string>
     <string name="serial_number">Serial number</string>
 
         <string name="init_db">Initialize DataBase</string>
@@ -28,7 +34,7 @@
     <string name="Exit">Exit</string>
     <string name="close">Close</string>
     <string name="cancel">Cancel</string>
-
+    <string name="share">Share File</string>
     <string name="settings">Setting</string>
     <string name="choose_menu">Choose a Menu Option</string>
     <string name="first_name">First name</string>
@@ -47,7 +53,7 @@
     <string name="db_setting"> DataBase Connection Settings</string>
     <string name="double_dot"> : </string>
     <string name="zero">0</string>
-
+    <string name="branch_name">Branch Name</string>
     <string name="start_date">Voucher Start Date</string>
     <string name="date_picker_title">Voucher Start Date</string>
     <string name="password">Password</string>
@@ -72,4 +78,8 @@
     <string name="broadcast_output_result_display_area">scanner display area</string>
     <string name="result_display_area_of_analog_key_output">result display area of Scanner </string>
     <string name="empty">Clear All</string>
+    <string name="communicate">Communicate</string>
+    <string name="backslash">/</string>
+    <string name="yes">YES</string>
+    <string name="doubledot">:</string>
 </resources>

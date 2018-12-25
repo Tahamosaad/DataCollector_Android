@@ -9,18 +9,25 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.saudisoft.mis_android.DAO.InvTransTypes_DAO;
 import com.saudisoft.mis_android.DAO.Setting_DAO;
 import com.saudisoft.mis_android.ExternalDatabase.CRUD_Operations;
+import com.saudisoft.mis_android.ExternalDatabase.Sync_Data;
 import com.saudisoft.mis_android.Model.InvTransTypes;
 import com.saudisoft.mis_android.Model.Settings;
 import com.saudisoft.mis_android.R;
@@ -31,15 +38,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button DataEntry_btn,SendData_btn,ReadVoucher_btn,Exit_btn;
     private InvTransTypes_DAO db;
     private Setting_DAO Setting_DAO;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private DrawerLayout drawerLayout;
     private EditText mUsername,mPassword;
+    private TextView mMessage;
     List<Settings> setting;
     CRUD_Operations new_data;
-    private  String DBNAME,DBserver;
+    Sync_Data my_data;
+    String Result;
+    private  String DBNAME,DBserver,Branchcode;
      boolean status;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         initViews();
 
         ChkInvTransData();
@@ -71,6 +85,89 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }).show();
         }
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.import_data:
+                        if (isNetworkAvailable())
+                            createAndShowDialog(ReadVoucher_Activity.class);
+                        else
+                            Toast.makeText(MainActivity.this,"Please Check your connection", Toast.LENGTH_SHORT).show();
+
+                        break;
+                    case R.id.send_data:
+                        if (isNetworkAvailable()) {
+                            createAndShowDialog(null);
+                        }else
+                            Toast.makeText(MainActivity.this,"Please Check your connection", Toast.LENGTH_SHORT).show();
+
+                        break;
+                    case R.id.scan_serial:
+                        startActivity(new Intent(MainActivity.this, Voucher_DataEntryActivity.class));
+                        MainActivity.this.finish();
+                        break;
+                    case R.id.About:
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialogCustom);
+                        builder.setTitle("Access Mate App")
+                                .setMessage(R.string.dialog_message)
+                                .setCancelable(false)
+                                .setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.dismiss();
+                                    }
+                                });
+
+                        AlertDialog about = builder.create();
+                        about.show();
+                        ((TextView) about.findViewById(android.R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
+                        break;
+                    case R.id.system_setting:
+                        if (isNetworkAvailable())
+                         startActivity(new Intent(MainActivity.this, SettingActivity.class));
+
+                        else
+                            Toast.makeText(MainActivity.this,"Please Check your connection", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.Share:
+                        Intent share = new Intent(Intent.ACTION_SEND);
+                        share.setType("text/plain");
+                        share.putExtra(Intent.EXTRA_TEXT, "Please  If you like our APP Share it with your friend Thanks ");
+                        startActivity(Intent.createChooser(share, "Access Mate App"));
+                        break;
+                    case R.id.db_setting:
+                        if (isNetworkAvailable())
+                        startActivity(new Intent(MainActivity. this, InitializeDataBaseActivity.class));
+                        else
+                            Toast.makeText(MainActivity. this,"Please Check your connection", Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        break;
+                }
+                return false;
+            }
+        });
+        drawerLayout = (DrawerLayout) findViewById(R.id.DrawerLayout);
+        mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close) {
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+            }
+        };
+        drawerLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                mDrawerToggle.syncState();
+            }
+        });
+        drawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerToggle.syncState();
     }
 
     private void initViews()
@@ -88,9 +185,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         this.setting = Setting_DAO.getAllSettings1();
         for (Settings cn : setting) {
             DBNAME= cn.getDatabaseName();
-        DBserver= cn.getServerName();}
+        DBserver= cn.getServerName();
+            Branchcode = cn.getBranchCode();
+        }
         this. new_data = new CRUD_Operations(DBNAME,DBserver);
-
+        this.my_data = new Sync_Data(DBNAME,Branchcode,DBserver,this);
     }
     public boolean CheckConnectionSettings(){
 //        if(setting.size()<1)
@@ -177,17 +276,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         if(v==DataEntry_btn) {
-            createAndShowDialog(Voucher_DataEntryActivity.class);
-        }
+            startActivity(new Intent(MainActivity.this, Voucher_DataEntryActivity.class));
+            MainActivity.this.finish();        }
         if(v==SendData_btn)
         if (isNetworkAvailable()) {
-            createAndShowDialog(SendDataToMIS.class);
+            createAndShowDialog(null);
         }else
             Toast.makeText(this,"Please Check your connection", Toast.LENGTH_SHORT).show();
         if(v==ReadVoucher_btn)
             if (isNetworkAvailable()){
-            startActivity(new Intent(MainActivity.this, ReadVoucher_Activity.class));
-                this.finish();
+                createAndShowDialog(ReadVoucher_Activity.class);
+//
             }
         else
             Toast.makeText(this,"Please Check your connection", Toast.LENGTH_SHORT).show();
@@ -221,10 +320,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked login button
+
                 if (Checkuser())
                 {
+                    if(ActivityToOpen!=null){
                     startActivity(new Intent(MainActivity.this, ActivityToOpen));
-                    MainActivity.this.finish();
+                    MainActivity.this.finish();}
+                    else
+                      Result=  my_data.sync_data();
+                       if(! Result .isEmpty())
+                        Toast.makeText(MainActivity.this,Result, Toast.LENGTH_SHORT).show();
+
                 }
                 else
                     Toast.makeText(MainActivity.this,"Incorrect user name or password !", Toast.LENGTH_SHORT).show();
@@ -265,5 +371,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         editor.putString( "password",mPassword.getText().toString());
         return editor.commit();
 //        editor.apply();
+    }
+    private void ShowDialog( String MSG )
+    {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        // Get the layout inflater
+        LayoutInflater inflater = this.getLayoutInflater();
+        // Inflate and set the layout for the dialog
+        View v = inflater.inflate( R.layout.sync_dialog, null );
+        // Pass null as the parent view because its going in the dialog layout
+        v.findViewById( R.id.panel1 );
+        builder.setView( v );
+        mMessage = v.findViewById(R.id.msg_txt);
+        mMessage.setText(MSG);
+        builder .setIcon(R.drawable.ic_warning) .setTitle("Sync Data Message");
+                //set title
+
+        // Add the buttons
+        builder.setPositiveButton( "OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked login button
+                if (isAlertDialogShowing((AlertDialog) dialog)) {
+                    dialog.dismiss();
+                }
+            }
+        } );
+
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }

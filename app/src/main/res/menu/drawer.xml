@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/import_data"
+            android:checked="false"
+            android:icon="@drawable/import_vouchers"
+            android:title="@string/read_voucher" />
+        <item
+            android:id="@+id/send_data"
+            android:checked="false"
+            android:icon="@drawable/ic_send"
+            android:title="@string/send_data" />
+
+        <item
+            android:id="@+id/scan_serial"
+            android:icon="@drawable/scan_serial"
+            android:checked="false"
+            android:title="@string/data_entry" />
+
+
+    </group>
+    <item android:title="@string/communicate">
+        <menu>
+            <group android:checkableBehavior="single">
+
+                <item
+                    android:id="@+id/Share"
+                    android:checked="false"
+                    android:icon="@drawable/ic_share"
+                    android:title="@string/share" />
+                <item
+                android:id="@+id/system_setting"
+                android:checked="false"
+                android:icon="@drawable/ic_setting"
+                android:title="@string/system_setting" />
+                <item
+                    android:id="@+id/db_setting"
+                    android:checked="false"
+                    android:icon="@drawable/ic_db"
+                    android:title="@string/init_db" />
+                <item
+                    android:id="@+id/About"
+                    android:checked="false"
+                    android:icon="@drawable/ic_about"
+                    android:title="@string/About_App" />
+
+            </group>
+        </menu>
+    </item>
+</menu>

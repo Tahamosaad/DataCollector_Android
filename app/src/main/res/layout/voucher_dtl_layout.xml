@@ -10,8 +10,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="5dp"
+        android:background="@drawable/list_selector"
         >
-        <TableRow         android:visibility="gone"
+        <TableRow
+            android:visibility="gone"
             >
 
 
@@ -61,7 +63,9 @@
                 />
 
         </TableRow>
-        <TableRow>
+        <TableRow
+            android:visibility="gone"
+            >
             <TextView android:text="@string/PartNo"/>
             <TextView android:text="@string/double_dot"/>
 
@@ -85,15 +89,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textSize="@dimen/medium_text"
                 android:text="@string/ItemCode"
                 android:textAppearance="?android:textAppearanceLarge"
                 android:textColor="@android:color/black"
-                android:textStyle="bold"
-                />
-        </TableRow>
-
-        <TableRow>
+                android:textSize="@dimen/medium_text"
+                android:textStyle="bold" />
 
             <TextView android:text="@string/QTY"/>
             <TextView android:text="@string/double_dot"/>
@@ -103,13 +103,13 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textSize="@dimen/medium_text"
                 android:text="@string/QTY"
                 android:textAppearance="?android:textAppearanceLarge"
                 android:textColor="@android:color/black"
-                android:textStyle="bold"
-                />
+                android:textSize="@dimen/medium_text"
+                android:textStyle="bold" />
         </TableRow>
+
     </TableLayout>
 
     <CheckBox

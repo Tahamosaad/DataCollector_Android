@@ -16,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +41,7 @@ public class CRUD_Operations {
     private ConnectionHelper conStr;
     private boolean Found;
     private int num = 0;
+    Map<String,String> datanum ;
     List<Map<String, String>> all_serial;
     public CRUD_Operations(String dbname, String dbserver) {
         this.conStr = new ConnectionHelper(dbname, dbserver);
@@ -178,10 +180,10 @@ public class CRUD_Operations {
         return datanum;
     }
 
-    public List<String> SelectVoucher(String Branchcode, String Startdate) {
+    public List<Map<String,String>> SelectVoucher(String Branchcode, String Startdate) {
 
         Statement stmt = null;
-        List<String> datanum = new ArrayList<>();
+        List<Map<String, String>> data =new ArrayList<>();
 
         try {
             connect = conStr.connectionclasss();        // Connect to database
@@ -194,17 +196,18 @@ public class CRUD_Operations {
                 stmt = connect.createStatement();
                 ResultSet rs = stmt.executeQuery(query);
                 while (rs.next()) {
-
-                    datanum.add(rs.getString("Serial"));
+                    datanum = new HashMap<>();
+                    datanum.put("Vserial",rs.getString("Serial"));
 //                    datanum.add(rs.getString("TransType"));
                     if (rs.getString("TransNum") == null) {
-                        datanum.add("null");
+                        datanum.put("TransNum","null");
                     } else {
-                        datanum.add(rs.getString("TransNum"));
+                        datanum.put("TransNum",rs.getString("TransNum"));
                     }
-                    datanum.add(rs.getString("TransCode"));
+                    datanum.put("TransCode",rs.getString("TransCode"));
                     java.sql.Date sqlDate = rs.getDate("TransDate");
-                    datanum.add(sqlDate.toString());
+                    datanum.put("TransDate",sqlDate.toString());
+                    data.add(datanum);
                 }
 
 
@@ -230,13 +233,14 @@ public class CRUD_Operations {
             }
         }
 
-        return datanum;
+        return data;
     }
 
-    public ArrayList<String> SelectedVoucherHdr(String Serials) {
+    public List<Map<String,String>> SelectedVoucherHdr(String Serials) {
 
         Statement stmt = null;
-        ArrayList<String> datanum = new ArrayList<>();
+
+        List<Map<String, String>> data =new ArrayList<>();
 
         try {
             connect = conStr.connectionclasss();        // Connect to database
@@ -248,24 +252,25 @@ public class CRUD_Operations {
                 stmt = connect.createStatement();
                 ResultSet rs = stmt.executeQuery(query);
                 while (rs.next()) {
-
-                    datanum.add(rs.getString("Serial"));
+                    datanum = new HashMap<>();
+                    datanum.put("Vserial",rs.getString("Serial"));
                     if (rs.getString("TransNum") == null) {
-                        datanum.add("null");
+                        datanum.put("TransNum","null");
                     } else {
-                        datanum.add(rs.getString("TransNum"));
+                        datanum.put("TransNum",rs.getString("TransNum"));
                     }
 //                    if(rs.wasNull()){datanum.add("null");}
-                    datanum.add(rs.getString("TransCode"));
+                    datanum.put("TransCode",rs.getString("TransCode"));
 //                    rs.getDate("TransDate").toString();
-                    datanum.add(rs.getDate("TransDate").toString());
+                    datanum.put("TransDate",rs.getDate("TransDate").toString());
 //                    datanum.add(rs.getString("TransType"));
                     if (rs.getString("Notes") == null) {
-                        datanum.add("null");
+                        datanum.put("Notes","null");
                     } else {
-                        datanum.add(rs.getString("Notes"));
+                        datanum.put("Notes",rs.getString("Notes"));
                     }
 //                    if(rs.wasNull()){datanum.add("null");}
+
                 }
 
 
@@ -291,7 +296,7 @@ public class CRUD_Operations {
             }
         }
 
-        return datanum;
+        return data;
     }
 
     public ArrayList<String> SelectedVoucherDtl(String Serials) {
@@ -400,7 +405,7 @@ public class CRUD_Operations {
 
 //        String data = "N/A";
         List<String> datanum = new ArrayList<>();
-//        Connection connect = null;
+        Connection connect = null;
         try {
 
             connect = conStr.connectionclasss();        // Connect to database
@@ -513,7 +518,6 @@ public class CRUD_Operations {
 
     }
 
-
     private List<Map<String, String>> getItemSerial(String mid, Context con) {
         List<Map<String, String>> saved_serials;
 
@@ -526,7 +530,7 @@ public class CRUD_Operations {
 
     }
 
-        private List<Map<String, String>> getItemDetails(String serial, Context con) {
+    private List<Map<String, String>> getItemDetails(String serial, Context con) {
         List<Map<String, String>> select_details;
         ItemsInOutL_DAO ItemDetail_DAO = new ItemsInOutL_DAO(con);
         select_details = ItemDetail_DAO.getItemDetails(serial);
@@ -648,8 +652,6 @@ public class CRUD_Operations {
         return isSaved;
     }
 
-
-
     private boolean CheckSerialIn(String Serial, String Item, String Store) {
         Statement stmt = null;
         Connection connect3 = null;
@@ -743,7 +745,7 @@ public class CRUD_Operations {
 
     }
 
-    private String GetStore(String BranchCode) {
+    public String GetStore(String BranchCode) {
         Statement stmt = null;
         String storecode = "";
         Connection connect3 = null;
@@ -1047,7 +1049,7 @@ public class CRUD_Operations {
             } catch (Exception e) {
                 e.getMessage();
             }
-            con.setAutoCommit(true);
+
         }
 
         return isSuccess;

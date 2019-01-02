@@ -15,9 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by taha.mosaad on 30/07/2018.
- */
 
 public class ItemsInOutL_DAO {
     public static final String TAG = "ItemsInOutL_DAO";
@@ -184,7 +181,7 @@ int i=0;
 //                itemdtl.setItemName(cursor.getString(3));
 //                itemdtl.setItemcode(cursor.getString(4));
 //                itemdtl.setQty(cursor.getInt(5));
-
+                datanum = new HashMap<>();
                 datanum.put("ID",cursor.getString(0));
                 datanum.put("Serial",cursor.getString(1));
                 datanum.put("PartNo",cursor.getString(2));

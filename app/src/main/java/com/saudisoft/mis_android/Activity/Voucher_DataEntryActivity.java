@@ -12,8 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -48,9 +46,9 @@ public class Voucher_DataEntryActivity extends AppCompatActivity {
     ArrayList<String> repeated_serial= new ArrayList<>();
     List<ItemsInOutH> headerList;
     List<ItemSerials> saved_serials;
-    List<Map<String,String>> item_serials;
-     boolean result;
-    FloatingActionButton btn_reset;
+//    List<Map<String,String>> item_serials;
+//     boolean result;
+    FloatingActionButton btn_add_serial;
     EditText scanner_input;
     int listitemcount;
     TextView listcount,listcount2,tv_count;
@@ -73,7 +71,7 @@ public class Voucher_DataEntryActivity extends AppCompatActivity {
         Serials_LV = (ListView) findViewById(R.id.serials_list);
         listcount2 = (TextView) findViewById(R.id.TV_count3);
         tv_count=(TextView)findViewById(R.id.tv_count1);
-        btn_reset = (FloatingActionButton) findViewById(R.id.btn_reset);
+        btn_add_serial = (FloatingActionButton) findViewById(R.id.btn_save_srl);
         scanner_input = (EditText) findViewById(R.id.txt_serial);
 
         //load data from saved shared preferences to this activity
@@ -98,6 +96,7 @@ public class Voucher_DataEntryActivity extends AppCompatActivity {
         initViews();
         // Get HeaderList from Intent
         //2. get (selected vouchers Header) from previous activity or locally
+
         if( ItemHeader_DAO.getAllItemheader() !=null)
             headerList =ItemHeader_DAO.getAllItemheader();
         else
@@ -234,11 +233,21 @@ public class Voucher_DataEntryActivity extends AppCompatActivity {
                             }
                         });
         Serials_LV.setOnTouchListener(touchListener);
-        btn_reset.setOnClickListener(new View.OnClickListener() {
+        btn_add_serial.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                ClearList();
+                if (Details_LV.getCount()<1) {
+                    Toast.makeText(Voucher_DataEntryActivity.this, "Please Select Voucher Details", Toast.LENGTH_SHORT).show();
+
+                }
+                if(Serials_LV.getCount()>0) {
+                    // add all inserted serials to VoucherSerial_list
+
+                        SaveDialog();
+
+
+                } else Toast.makeText(Voucher_DataEntryActivity.this, "Please Enter Serial", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -293,28 +302,28 @@ public class Voucher_DataEntryActivity extends AppCompatActivity {
 //		endregion
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.savemenu, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-    // handle add serials button activities
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (Details_LV.getCount()<1) {
-            Toast.makeText(this, "Please Select Voucher Details", Toast.LENGTH_SHORT).show();
-            return super.onOptionsItemSelected(item);
-        }
-        if(Serials_LV.getCount()>0) {
-            // add all inserted serials to VoucherSerial_list
-            if (id == R.id.save_serial_btn) {
-                SaveDialog();
-            }
-
-        } else Toast.makeText(this, "Please Enter Serial", Toast.LENGTH_SHORT).show();
-            return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.savemenu, menu);
+//        return super.onCreateOptionsMenu(menu);
+//    }
+//    // handle add serials button activities
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        int id = item.getItemId();
+//        if (Details_LV.getCount()<1) {
+//            Toast.makeText(this, "Please Select Voucher Details", Toast.LENGTH_SHORT).show();
+//            return super.onOptionsItemSelected(item);
+//        }
+//        if(Serials_LV.getCount()>0) {
+//            // add all inserted serials to VoucherSerial_list
+//            if (id == R.id.save_serial_btn) {
+//                SaveDialog();
+//            }
+//
+//        } else Toast.makeText(this, "Please Enter Serial", Toast.LENGTH_SHORT).show();
+//            return super.onOptionsItemSelected(item);
+//    }
 // add to serial list new item
     public void addToList(String barcode) {
         if(!barcode.isEmpty()){
@@ -464,7 +473,8 @@ public class Voucher_DataEntryActivity extends AppCompatActivity {
 
         AlertDialog dialog = builder.create();
         dialog.show();
-    } public boolean isAlertDialogShowing(AlertDialog thisAlertDialog) {
+    }
+    public boolean isAlertDialogShowing(AlertDialog thisAlertDialog) {
         return thisAlertDialog != null && thisAlertDialog.isShowing();
     }
 }

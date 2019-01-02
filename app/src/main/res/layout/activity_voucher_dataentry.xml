@@ -80,7 +80,7 @@
         <ListView
             android:id="@+id/voucher_dtl"
             android:layout_width="match_parent"
-            android:layout_height="130dp"
+            android:layout_height="160dp"
             android:layout_marginTop="0dp"
             android:choiceMode="singleChoice"
             android:dividerHeight="1dp"
@@ -137,13 +137,12 @@
 
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/btn_reset"
-            android:layout_width="35dp"
+            android:id="@+id/btn_save_srl"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"
             android:layout_margin="16dp"
-            android:visibility="gone"
-            android:src="@drawable/ic_delete" />
+            android:src="@drawable/ic_save_local" />
 
         <ListView
             android:id="@+id/serials_list"

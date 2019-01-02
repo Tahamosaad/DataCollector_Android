@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,48 +7,57 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:fitsSystemWindows="true"
     tools:context="com.saudisoft.mis_android.Activity.ReadVoucher_Activity">
-    <TableLayout
+    <android.support.v7.widget.CardView
         android:id="@+id/start_date"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:orientation="horizontal"
-        >
-        <TableRow>
+        android:layout_height="50dp"
+        android:thicknessRatio="1.9"
+        android:layout_marginTop="@dimen/small_text"
+        android:layout_marginBottom="@dimen/small_text"
+        android:orientation="horizontal" >
+    <TableLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+       >
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
         <TextView
             android:id="@+id/text_view_gender"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:text="@string/select_Date"
+            android:layout_marginTop="5dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:textAlignment="center"
             android:textColor="@color/black"
-
-            android:textSize="@dimen/add_edit_textsize"
+            android:textSize="@dimen/large_text"
             />
         <EditText
             android:id="@+id/edit_text_start_date"
             android:hint="@string/start_date"
             android:focusable="false"
 
-            android:layout_width="wrap_content"
-            android:layout_weight="8"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="match_parent"
             android:inputType="date"
             android:textAppearance="?android:attr/textAppearance"
             android:textColor="@android:color/black"
-            android:gravity="left" />
-        <!--<ImageView-->
-            <!--android:id="@+id/image_view_start_date"-->
-            <!--android:src="@android:drawable/ic_menu_my_calendar"-->
-            <!--android:background="@color/colorPrimary"-->
-            <!--android:layout_weight="5"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="match_parent" />-->
+            android:gravity="start" />
+        <ImageView
+            android:id="@+id/image_view_start_date"
+            android:src="@android:drawable/ic_menu_my_calendar"
+            android:background="@color/colorPrimary"
+            android:layout_weight="0.5"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
         </TableRow>
     </TableLayout>
-    <LinearLayout
+    </android.support.v7.widget.CardView>
+    <android.support.v7.widget.CardView
         android:id="@+id/Vouchers"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -57,7 +65,13 @@
         android:layout_below="@+id/start_date"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true">
-
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/btn_save_local"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_save_local" />
         <ListView
                 android:id="@+id/list_vouchers"
                 android:layout_width="match_parent"
@@ -65,5 +79,5 @@
                 android:layout_marginTop="4dp"
                 android:dividerHeight="0.5dp" />
 
-</LinearLayout>
+</android.support.v7.widget.CardView>
 </RelativeLayout>

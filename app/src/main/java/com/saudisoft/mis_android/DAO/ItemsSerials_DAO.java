@@ -150,31 +150,6 @@ public class ItemsSerials_DAO {
         return data;
     }
 
-//
-//    public  List<Map<String,String>> getDetailSerials(String serial) {
-//        datanum = new HashMap<>();
-//        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-//        List<Map<String, String>> data = new ArrayList<>();
-//
-//        Cursor cursor = db.query(
-//                DBHelper.TABLE_ITEM_SERIAL,        // The table to query
-//                mAllColumns,       // The array of columns to return (pass null to get all)
-//                DBHelper.COL_SERIALNUM + "=?",                          // The array of columns to return (pass null to get all)
-//                new String[] { (serial) },                         // The columns for the WHERE clause
-//                null,                                                        // The values for the WHERE clause
-//                null,                                                        // don't group the rows
-//                null,                                                        // don't filter by row groups
-//                null);                                                       // The sort order
-//        if (cursor != null)
-//            cursor.moveToFirst();
-//        datanum.put("Serial",cursor.getString(0));
-//        datanum.put("Serialnum",cursor.getString(1));
-//
-//        data.add(datanum);
-//        cursor.close();
-//        return data;
-//    }
-    //
     public  List<ItemSerials> getSavedSerials(String id) {
 //        datanum = new HashMap<>();
         List<ItemSerials> SavedSerialList = new ArrayList<>();

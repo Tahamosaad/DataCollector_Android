@@ -10,7 +10,6 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
-
         android:icon="@mipmap/ic_mislogo"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_sslogo_round"
@@ -47,26 +46,21 @@
         <activity android:name=".Activity.InitializeDataBaseActivity" />
         <activity
             android:name=".Activity.ReadVoucher_Activity"
-            android:screenOrientation="portrait"
             android:label="@string/read_voucher_title"
-            />
-
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Activity.Voucher_DataEntryActivity"
-            android:screenOrientation="portrait"
             android:label="@string/data_entry_title"
-
-            />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Activity.SendDataToMIS"
-            android:screenOrientation="portrait"
             android:label="@string/send_data_title"
-        />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Activity.AddSerials"
-            android:screenOrientation="portrait"
             android:label="@string/add_serial_title"
-            />
+            android:screenOrientation="portrait" />
+        <activity android:name=".Activity.CreateVoucher"></activity>
     </application>
 
 </manifest>

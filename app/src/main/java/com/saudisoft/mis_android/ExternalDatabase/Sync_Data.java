@@ -49,6 +49,9 @@ public class Sync_Data {
         this.Branchcode = branchcode;
         this.DBserver = DBserver;
         this.context=context;
+        this.ItemHeader_DAO = new ItemInOutH_DAO(context);
+        this.ItemDetail_DAO = new ItemsInOutL_DAO(context);
+        this.ItemSerial_DAO = new ItemsSerials_DAO(context);
     }
     private void init_Data()
     {
@@ -56,9 +59,7 @@ public class Sync_Data {
         SharedPreferences get = context.getSharedPreferences( "User_data",MODE_PRIVATE );
         MISUser= get.getString("name",DEFAULT) ;
 
-        this.ItemHeader_DAO = new ItemInOutH_DAO(context);
-        this.ItemDetail_DAO = new ItemsInOutL_DAO(context);
-        this.ItemSerial_DAO = new ItemsSerials_DAO(context);
+
     }
     //    private  String SaveData(){
 //        init_Data();
@@ -165,27 +166,38 @@ public class Sync_Data {
 
 
     }
-    private List<Map<String, String>> getItemHeader(String serial) {
-        List<Map<String, String>> headerlist;
-
-        headerlist = this.ItemHeader_DAO.getItemHeader(serial);
-//        if (headerlist.size() > 0)
-            return headerlist;
-//        else return null;
+    public int ItemHeaderCount() {
+        List<ItemsInOutH> headerlist;
+        headerlist = this.ItemHeader_DAO.getAllItemheader();
+        if (headerlist.size() > 0 )
+            return headerlist.size();
+        else return 0;
     }
+    public int ItemDetailCount() {
+        List<Map<String,String >> Detiallist;
+        Detiallist = this.ItemDetail_DAO.GetAllItemDetails();
 
-    public int sumqty(Map<String,String> dtl){
-        for (String key: dtl.keySet())
+        if (Detiallist.size() > 0 )
+            return Detiallist.size();
+        else return 0;
+    }
+    public int ItemSerialCount() {
+        total_QTY=0;
+        List<Map<String,String >> Detiallist;
+        Detiallist = this.ItemDetail_DAO.GetAllItemDetails();
+        for (Map<String,String > dtl:Detiallist) {
             total_QTY += Integer.valueOf( dtl.get("QTY"));
+        }
         return total_QTY;
     }
+
 
 
     public boolean isAlertDialogShowing(AlertDialog thisAlertDialog) {
         return thisAlertDialog != null && thisAlertDialog.isShowing();
     }
     private boolean mResult;
-    public boolean SaveDialog( String message, Context context) {
+    private boolean SaveDialog(String message, Context context) {
         String title="";
 //         make a handler that throws a runtime exception when a message is received
         final Handler handler = new Handler() {

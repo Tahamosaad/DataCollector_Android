@@ -2,11 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/menu_item_settings"
-        android:title="@string/system_setting"
+        android:id="@+id/item_logout"
+        android:title="@string/logout"
         app:showAsAction="never"/>
     <item
-        android:id="@+id/menu_init_db"
-        android:title="@string/init_db"
+        android:id="@+id/item_exit"
+        android:title="@string/Exit"
         app:showAsAction="never"/>
 </menu>

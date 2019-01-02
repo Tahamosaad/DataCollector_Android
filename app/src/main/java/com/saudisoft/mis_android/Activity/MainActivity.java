@@ -19,7 +19,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,22 +31,25 @@ import com.saudisoft.mis_android.Model.InvTransTypes;
 import com.saudisoft.mis_android.Model.Settings;
 import com.saudisoft.mis_android.R;
 
+import java.util.Calendar;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
-    private Button DataEntry_btn,SendData_btn,ReadVoucher_btn,Exit_btn;
-    private InvTransTypes_DAO db;
+    NavigationView navigationView;
+    private InvTransTypes_DAO transTypes_dao;
     private Setting_DAO Setting_DAO;
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout drawerLayout;
+    private final String DEFAULT = "N/A";
     private EditText mUsername,mPassword;
-    private TextView mMessage;
+    private TextView mMessage,Imported_V_tv,Sent_V_tv,Created_V_tv,MISUser_tv,Sys_MSG_tv,totalitem_tv,totalsrl_tv,Datetime_tv,User_nav,Branch_nav,Notification_tv;
     List<Settings> setting;
     CRUD_Operations new_data;
     Sync_Data my_data;
     String Result;
+    int sentcount=0;
     private  String DBNAME,DBserver,Branchcode;
-     boolean status;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,11 +62,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (!CheckConnectionSettings()){
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 //set icon
-                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setIcon(R.drawable.ic_warning)
                 //set title
                 .setTitle("System Setting Connection")
                 //set message
-                .setMessage("Connection Data Are'nt Set Press 'yes' to Initialize it ")
+                .setMessage("Connection Data Are'nt Set \n Press 'yes' to Initialize it ")
                 //set positive button
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
@@ -85,7 +87,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }).show();
         }
-        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        //region  side navigation
+
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
@@ -110,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         break;
                     case R.id.About:
                         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialogCustom);
-                        builder.setTitle("Access Mate App")
+                        builder.setTitle("MIS App")
                                 .setMessage(R.string.dialog_message)
                                 .setCancelable(false)
                                 .setNegativeButton("OK", new DialogInterface.OnClickListener() {
@@ -148,6 +151,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return false;
             }
         });
+        // endregion
         drawerLayout = (DrawerLayout) findViewById(R.id.DrawerLayout);
         mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close) {
             @Override
@@ -157,6 +161,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onDrawerOpened(View drawerView) {
+
+
                 super.onDrawerOpened(drawerView);
             }
         };
@@ -172,52 +178,63 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initViews()
     {
-        this.db = new InvTransTypes_DAO(this);
+
+        this.transTypes_dao = new InvTransTypes_DAO(this);
         this.Setting_DAO = new Setting_DAO(this);
-        DataEntry_btn= (Button) findViewById(R.id.button_data_entry);
-        SendData_btn= (Button) findViewById(R.id.button_send_data);
-        ReadVoucher_btn= (Button) findViewById(R.id.button_read_voucher);
-        Exit_btn= (Button) findViewById(R.id.button_exit);
-        DataEntry_btn.setOnClickListener(this);
-        SendData_btn.setOnClickListener(this);
-        ReadVoucher_btn.setOnClickListener(this);
-        Exit_btn.setOnClickListener(this);
+        navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        View headerView = navigationView.getHeaderView(0);
+
+        Imported_V_tv = (TextView) findViewById(R.id.TV_iv);
+        Created_V_tv=(TextView)findViewById(R.id.TV_cv) ;
+        Sent_V_tv=(TextView)findViewById(R.id.TV_sv) ;
+        Notification_tv=(TextView)findViewById(R.id.status_header_TV);
+        Sys_MSG_tv = (TextView)findViewById(R.id.status_TV) ;
+        totalitem_tv=(TextView)findViewById(R.id.totalitem_TV);
+        totalsrl_tv=(TextView)findViewById(R.id.totalserial_TV);
+        MISUser_tv=(TextView)findViewById(R.id.username_TV) ;
+        User_nav=(TextView)headerView. findViewById(R.id.user_name_txt) ;
+        Branch_nav=(TextView)headerView.findViewById(R.id.branch_name_txt) ;
+        Datetime_tv=(TextView)findViewById(R.id.date_time_TV) ;
+
+        Created_V_tv.setOnClickListener(this);
+        Sent_V_tv.setOnClickListener(this);
+        Imported_V_tv.setOnClickListener(this);
         this.setting = Setting_DAO.getAllSettings1();
         for (Settings cn : setting) {
-            DBNAME= cn.getDatabaseName();
+        DBNAME= cn.getDatabaseName();
         DBserver= cn.getServerName();
-            Branchcode = cn.getBranchCode();
+        Branchcode = cn.getBranchCode();
         }
         this. new_data = new CRUD_Operations(DBNAME,DBserver);
         this.my_data = new Sync_Data(DBNAME,Branchcode,DBserver,this);
-    }
-    public boolean CheckConnectionSettings(){
-//        if(setting.size()<1)
-//            return false;
-//        else return true;
-        return !(setting.size()<1);
+        //load data from saved shared preferences to this activity
 
-//        for (Settings cn : setting) {
-//          cn.getServerName().toString();}
+        update_txt();
     }
+    public boolean CheckConnectionSettings(){return !(setting.size()<1);}
     // check if invtrans type table is empty or not
     private void ChkInvTransData(){
 
 //         Reading all Trans
 //        Log.d("Reading: ", "Reading all Trans..");
-        List<InvTransTypes> Trans = db.getAllInvTransType();
+        List<InvTransTypes> Trans = transTypes_dao.getAllInvTransType();
 
 
         if (Trans.size()<=0 ){
-            DataEntry_btn.setEnabled(false);
-            SendData_btn.setEnabled(false);
-            ReadVoucher_btn.setEnabled(false);}
+            Imported_V_tv.setEnabled(false);
+            Sent_V_tv.setEnabled(false);
+            Created_V_tv.setEnabled(false);
+            Imported_V_tv.setText("0");
+            Sent_V_tv.setText("0");
+            Created_V_tv.setText("0");
+            MISUser_tv.setText("");
+        }
 
         else{
             //data not initialized yet
-            DataEntry_btn.setEnabled(true);
-            SendData_btn.setEnabled(true);
-            ReadVoucher_btn.setEnabled(true);}
+            Imported_V_tv.setEnabled(true);
+            Sent_V_tv.setEnabled(true);
+            Created_V_tv.setEnabled(true);}
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -228,19 +245,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-       if (id == R.id.menu_item_settings) {
+       if (id == R.id.item_logout) {
            if (isNetworkAvailable())
-           { startActivity(new Intent(this, SettingActivity.class));
+           { startActivity(new Intent(this, InitializeDataBaseActivity.class));
             return true;}
            else
                Toast.makeText(this,"Please Check your connection", Toast.LENGTH_SHORT).show();
         }
-        if (id == R.id.menu_init_db) {
-            if (isNetworkAvailable())
-            {startActivity(new Intent(this, InitializeDataBaseActivity.class));
-            return true;}
-            else
-                Toast.makeText(this,"Please Check your connection", Toast.LENGTH_SHORT).show();
+        if (id == R.id.item_exit) {
+            this.finish();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -271,28 +284,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        db.close();
+        transTypes_dao.close();
     }
     @Override
     public void onClick(View v) {
-        if(v==DataEntry_btn) {
-            startActivity(new Intent(MainActivity.this, Voucher_DataEntryActivity.class));
-            MainActivity.this.finish();        }
-        if(v==SendData_btn)
+        if(v==Created_V_tv) {
+            if (isNetworkAvailable()) {
+                startActivity(new Intent(MainActivity.this, CreateVoucher.class));
+                MainActivity.this.finish();
+            }else
+                Toast.makeText(this,"Please Check your connection", Toast.LENGTH_SHORT).show();
+
+        }
+        if(v==Sent_V_tv)
         if (isNetworkAvailable()) {
             createAndShowDialog(null);
         }else
             Toast.makeText(this,"Please Check your connection", Toast.LENGTH_SHORT).show();
-        if(v==ReadVoucher_btn)
-            if (isNetworkAvailable()){
-                createAndShowDialog(ReadVoucher_Activity.class);
-//
-            }
-        else
-            Toast.makeText(this,"Please Check your connection", Toast.LENGTH_SHORT).show();
+        if(v==Imported_V_tv)
+        {startActivity(new Intent(MainActivity.this, Voucher_DataEntryActivity.class));
+        MainActivity.this.finish();}
 
-        if (v== Exit_btn)
-            this.finish();
+
+
 
     }
 
@@ -312,6 +326,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         View v = inflater.inflate( R.layout.login_dialog, null );
         // Pass null as the parent view because its going in the dialog layout
         v.findViewById( R.id.panel );
+        builder.setTitle("LOGIN DIALOG");
+        builder.setIcon(R.drawable.ic_profile_img);
         builder.setView( v );
         mUsername =  v.findViewById(R.id.username);
         mPassword = v.findViewById(R.id.password);
@@ -326,11 +342,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if(ActivityToOpen!=null){
                     startActivity(new Intent(MainActivity.this, ActivityToOpen));
                     MainActivity.this.finish();}
-                    else
-                      Result=  my_data.sync_data();
-                       if(! Result .isEmpty())
-                        Toast.makeText(MainActivity.this,Result, Toast.LENGTH_SHORT).show();
+                    else {
+                        Result = my_data.sync_data();
+                        if (!Result.isEmpty() ){
+                            SharedPreferences sharedPreferences = getSharedPreferences( "User_data", Context.MODE_PRIVATE );
 
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            sentcount=Integer.valueOf( sharedPreferences.getString("sendcount","0"))+1;
+                            editor.putString("sendmsg", Result);
+                            editor.putString("sendcount", sentcount+"");
+                            editor.apply();
+//                            Toast.makeText(MainActivity.this, Result, Toast.LENGTH_SHORT).show();
+                        }
+                    }update_txt();
                 }
                 else
                     Toast.makeText(MainActivity.this,"Incorrect user name or password !", Toast.LENGTH_SHORT).show();
@@ -359,6 +383,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     public boolean isAlertDialogShowing(AlertDialog thisAlertDialog) {
         return thisAlertDialog != null && thisAlertDialog.isShowing();
+    }
+    public void update_txt(){
+        SharedPreferences get = this.getSharedPreferences( "User_data",MODE_PRIVATE );
+        MISUser_tv.setText(get.getString("name",DEFAULT));
+        Calendar cal = Calendar.getInstance();
+        String mDate= cal.get(Calendar.HOUR)+":"+cal.get(Calendar.MINUTE)+ "\n"+cal.get(Calendar.DATE)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+cal.get(Calendar.YEAR);
+        Datetime_tv.setText(mDate);
+        User_nav.setText(MISUser_tv.getText());
+        Branch_nav.setText(new_data.GetStore(Branchcode));
+        Sys_MSG_tv.setText(get.getString("sendmsg",DEFAULT));
+        Imported_V_tv.setText(my_data.ItemHeaderCount()+"");
+        totalitem_tv.setText(my_data.ItemDetailCount()+"");
+        Sent_V_tv.setText(get.getString("sendcount","0"));
+        totalsrl_tv.setText(my_data.ItemSerialCount()+"");
     }
     public  boolean Save()
     {

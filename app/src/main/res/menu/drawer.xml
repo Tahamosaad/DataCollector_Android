@@ -24,7 +24,6 @@
     <item android:title="@string/communicate">
         <menu>
             <group android:checkableBehavior="single">
-
                 <item
                     android:id="@+id/Share"
                     android:checked="false"
@@ -45,7 +44,6 @@
                     android:checked="false"
                     android:icon="@drawable/ic_about"
                     android:title="@string/About_App" />
-
             </group>
         </menu>
     </item>

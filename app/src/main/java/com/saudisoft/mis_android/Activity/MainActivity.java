@@ -57,8 +57,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     String Result;
     int sentcount=0;
     private  String DBNAME,DBserver,Branchcode;
-    private void initViews()
-    {
+    private void initViews() {
 
         this.transTypes_dao = new InvTransTypes_DAO(this);
         com.saudisoft.mis_android.DAO.Setting_DAO setting_DAO = new Setting_DAO(this);
@@ -219,8 +218,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         drawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
     }
-
-
     public boolean CheckConnectionSettings(){return !(setting.size()<1);}
     // check if invtrans type table is empty or not
     private void ChkInvTransData(){

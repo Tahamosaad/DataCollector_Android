@@ -53,7 +53,7 @@ public class ItemInOutH_DAO {
         mDbHelper.close();
     }
 
-    public void addItemHeader(ItemsInOutH item) {
+    public long addItemHeader(ItemsInOutH item) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         InvTransTypes_DAO dao = new InvTransTypes_DAO(mContext);
         InvTransTypes Trans = dao.getTransBycode(item.getTransCode());
@@ -68,8 +68,9 @@ public class ItemInOutH_DAO {
         values.put(DBHelper.COLUMN_IS_NEW, item.getIsNew());
 
         // Inserting Row
-        db.insert(DBHelper.TABLE_ITEM_HEADER, null, values);
+       long ER = db.insert(DBHelper.TABLE_ITEM_HEADER, null, values);
         db.close(); // Closing database connection
+        return ER;
     }
     //Overload
     public ItemsInOutH createItemHeader(String itemSerial, int transType, String transNumber, String transDate, String transNote, int isNew,
@@ -131,21 +132,29 @@ public class ItemInOutH_DAO {
         cursor.close();
         return data;
     }
-    public List<ItemsInOutH> getAllItemsInOutH() {
-        List<ItemsInOutH> listItemsInOutHs = new ArrayList<>();
+    public List<Map<String,String>>  getAllItemsInOutH() {
+        datanum = new HashMap<>();
+        String selectQuery = "SELECT * FROM " + DBHelper.TABLE_ITEM_HEADER;
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        List<Map<String, String>> data = new ArrayList<>();
+        Cursor cursor = db.rawQuery(selectQuery, null);                                                       // The sort order
 
-        Cursor cursor = mDatabase.query(DBHelper.TABLE_ITEM_HEADER, mAllColumns,
-                null, null, null, null, null);
+         if (cursor != null&& cursor.moveToFirst()){
+do{
+//
+         datanum = new HashMap<>();
+        datanum.put("Vserial",cursor.getString(0));
+        datanum.put("TransNum",cursor.getString(1));
+        datanum.put("trans_type",cursor.getString(2));
+        datanum.put("TransDate",cursor.getString(3));
+        datanum.put("Notes",cursor.getString(4));
+        datanum.put("is_new",cursor.getString(5));
+        datanum.put("TransCode",cursor.getString(6));
+        data.add(datanum);
+        } while (cursor.moveToNext());
+        cursor.close();}
 
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            ItemsInOutH item = cursorToItemHdr(cursor);
-            listItemsInOutHs.add(item);
-            cursor.moveToNext();
-        }
-        // make sure to close the cursor
-        cursor.close();
-        return listItemsInOutHs;
+        return data;
     }
     public List<ItemsInOutH> getAllItemheader() {
         List<ItemsInOutH> contactList = new ArrayList<>();
@@ -156,7 +165,7 @@ public class ItemInOutH_DAO {
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         // looping through all rows and adding to list
-        if (cursor.moveToFirst()) {
+        if (cursor != null && cursor.moveToFirst()) {
             do {
 
                 ItemsInOutH item = new ItemsInOutH();
@@ -190,7 +199,7 @@ public class ItemInOutH_DAO {
         int affectedRows = database.delete(DBHelper.TABLE_ITEM_HEADER, null, null);
         return affectedRows > 0;
     }
-    public List<ItemsInOutH> getItemsInOutHOfTrans(String  Transcode) {
+    List<ItemsInOutH> getItemsInOutHOfTrans(String Transcode) {
         List<ItemsInOutH> listItemsInOutH = new ArrayList<>();
 
         Cursor cursor = mDatabase.query(DBHelper.TABLE_ITEM_HEADER, mAllColumns,

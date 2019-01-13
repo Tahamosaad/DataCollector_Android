@@ -14,28 +14,29 @@ import java.sql.SQLException;
 
 public class ConnectionHelper {
     // Declaring Server ip, username, database name and password
-    String ip,db,DBUserNameStr,DBPasswordStr;
+    private String ip,db,DBUserNameStr,DBPasswordStr;
+   // public static DataConnection dbc = new DataConnection();
 
     //this is connection helper constructor with two parameter server name and db name
     // note :must add db name and password for more security
-    public ConnectionHelper(String dbname,String dbserver) {
-        this.ip =dbserver;
-        this.db =dbname;
+    ConnectionHelper(String dbname, String dbserver) {
+        this.ip =dbserver;//dbc.setServerName(dbserver);
+        this.db =dbname; //dbc.setDBName(dbname);
         //region user option to make db username and server static
         //for more secure it must taken from user as db name and server name
-        this.DBUserNameStr = "sa";
-       this.DBPasswordStr = "MSSTSandURV1";
+        this.DBUserNameStr = "sa";//dbc.setDB_Username("sa");
+       this.DBPasswordStr = "MSSTSandURV1";//dbc.setServerPWD("MSSTSandURV1");
         //endregion
     }
 
     @SuppressLint("NewApi")
-    public Connection connectionclasss( )
+    Connection connectionclasss()
     {
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         java.sql.Connection connection = null;
-        String ConnectionURL = null;
+        String ConnectionURL ;
         try
         {
             Class.forName("net.sourceforge.jtds.jdbc.Driver");

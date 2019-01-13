@@ -22,48 +22,50 @@ import java.util.Map;
 
 import static android.text.TextUtils.indexOf;
 
-//import static android.icu.text.MessagePattern.ArgType.SELECT;
-
-/**
- * Created by Taha mosaad on {6/10/2018}.
- */
 
 public class CRUD_Operations {
 
-    public Boolean isSuccess = false;
+    private Boolean isSuccess = false;
     //    Statement stmt = null;
     public String exString = null;
-    public String Sql_MSG, SQL;
+    public String Sql_MSG;
     private Connection connect;
-    private Context context;
-    private TextView mMessage;
-    private String ConnectionResult = "";
     private ConnectionHelper conStr;
     private boolean Found;
     private int num = 0;
-    Map<String,String> datanum ;
+    private Map<String,String> stringMap ;
+    private List<String> datanum ;
+    private Context context;
+    private TextView mMessage;
+    private String ConnectionResult = "";
     List<Map<String, String>> all_serial;
+//    public static DataConnection dbc = new DataConnection();
     public CRUD_Operations(String dbname, String dbserver) {
         this.conStr = new ConnectionHelper(dbname, dbserver);
     }
+    public CRUD_Operations(){
 
-    //    public java.sql.Connection getconnection (){
-//
-//        try {
-//            connect = conStr.connectionclasss();        // Connect to database
-//            if (connect == null)
-//            ConnectionResult = "Check Your Internet Access!";
-//        }
-//        catch(Exception ex)
-//        {
-//            ex.printStackTrace();
-//            Log.e("Error", ex.toString());
-//            isSuccess = false;
-//            ConnectionResult = ex.getMessage();
-//        }
-//
-//             return connect;
-//    }
+    }
+//    region getconnection
+        public java.sql.Connection getconnection (){
+
+        try {
+            connect = conStr.connectionclasss();        // Connect to database
+            if (connect == null)
+            ConnectionResult = "Check Your Internet Access!";
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+            Log.e("Error", ex.toString());
+            isSuccess = false;
+            ConnectionResult = ex.getMessage();
+        }
+
+             return connect;
+    }
+    //endregion
+    //region
 //    public void SelectUsers2(  ) throws SQLException {
 //
 //
@@ -90,16 +92,14 @@ public class CRUD_Operations {
 //            }
 //
 //    }
+    //endregion
     public List<String> SelectTrans() {
         Statement stmt = null;
-
+        datanum = new ArrayList<>();
 //        String data = "N/A";
-        List<String> datanum = new ArrayList<>();
         try {
-            connect = conStr.connectionclasss();        // Connect to database
-            if (connect == null) {
-                ConnectionResult = "Check Your Internet Access!";
-            } else {
+            connect = getconnection ();        // Connect to database
+            if (connect != null) {
                 // Change below query according to your own database.
                 //
                 String query = "select * from InvTransTypes order by TransCode";
@@ -139,12 +139,10 @@ public class CRUD_Operations {
     public List<String> SelectItems() {
         Statement stmt = null;
 //        String data = "N/A";
-        List<String> datanum = new ArrayList<>();
+      datanum = new ArrayList<>();
         try {
-            connect = conStr.connectionclasss();        // Connect to database
-            if (connect == null) {
-                ConnectionResult = "Check Your Internet Access!";
-            } else {
+            connect = getconnection ();        // Connect to database
+            if (connect != null)  {
                 // Change below query according to your own database.
                 //
                 String query = "select ItemCode,ItemName,PartNumber from ItemsDirectory where ItemType =0 and Active=1 and Serialized=1 order by ItemCode ";
@@ -191,23 +189,28 @@ public class CRUD_Operations {
                 ConnectionResult = "Check Your Internet Access!";
             } else {
                 // Change below query according to your own database.
-                String query = "SELECT TOP (100) Serial, TransNum, TransCode, TransDate FROM dbo.ItemsInOutH WHERE (IsPosted = 0) AND (BranchCode = '" + Branchcode + "') AND (TransDate >= '" + Startdate + "') AND (Serial IN (SELECT ItemsInOutH_1.Serial FROM dbo.ItemsInOutH AS ItemsInOutH_1 INNER JOIN dbo.ItemsInOutL ON ItemsInOutH_1.Serial = dbo.ItemsInOutL.Serial INNER JOIN dbo.ItemsDirectory ON dbo.ItemsInOutL.ItemCode = dbo.ItemsDirectory.ItemCode WHERE (ItemsInOutH_1.IsPosted = 0) AND (ItemsInOutH_1.BranchCode = '" + Branchcode + "') AND (ItemsInOutH_1.TransDate >= '" + Startdate + "') GROUP BY ItemsInOutH_1.Serial HAVING (SUM(dbo.ItemsDirectory.Serialized) > 0))) ORDER BY TransDate";
+                String query = "SELECT TOP (100) Serial, TransNum, TransCode, TransDate,Notes FROM dbo.ItemsInOutH WHERE (IsPosted = 0) AND (BranchCode = '" + Branchcode + "') AND (TransDate >= '" + Startdate + "') AND (Serial IN (SELECT ItemsInOutH_1.Serial FROM dbo.ItemsInOutH AS ItemsInOutH_1 INNER JOIN dbo.ItemsInOutL ON ItemsInOutH_1.Serial = dbo.ItemsInOutL.Serial INNER JOIN dbo.ItemsDirectory ON dbo.ItemsInOutL.ItemCode = dbo.ItemsDirectory.ItemCode WHERE (ItemsInOutH_1.IsPosted = 0) AND (ItemsInOutH_1.BranchCode = '" + Branchcode + "') AND (ItemsInOutH_1.TransDate >= '" + Startdate + "') GROUP BY ItemsInOutH_1.Serial HAVING (SUM(dbo.ItemsDirectory.Serialized) > 0))) ORDER BY TransDate";
 //                String query ="SELECT top 100 ItemsInOutH.Serial,TransNum,TransCode,TransDate FROM ItemsInOutH INNER JOIN ItemsInOutL ON ItemsInOutH.Serial = ItemsInOutL.Serial INNER JOIN ItemsDirectory ON ItemsInOutL.ItemCode = ItemsDirectory.ItemCode WHERE (Serialized = 1) and IsPosted=0 AND BranchCode='"+Branchcode+"' AND TransDate>='"+Startdate+"'";
                 stmt = connect.createStatement();
                 ResultSet rs = stmt.executeQuery(query);
                 while (rs.next()) {
-                    datanum = new HashMap<>();
-                    datanum.put("Vserial",rs.getString("Serial"));
+                    stringMap = new HashMap<>();
+                    stringMap.put("Vserial",rs.getString("Serial"));
 //                    datanum.add(rs.getString("TransType"));
                     if (rs.getString("TransNum") == null) {
-                        datanum.put("TransNum","null");
+                        stringMap.put("TransNum","null");
                     } else {
-                        datanum.put("TransNum",rs.getString("TransNum"));
+                        stringMap.put("TransNum",rs.getString("TransNum"));
                     }
-                    datanum.put("TransCode",rs.getString("TransCode"));
+                    stringMap.put("TransCode",rs.getString("TransCode"));
                     java.sql.Date sqlDate = rs.getDate("TransDate");
-                    datanum.put("TransDate",sqlDate.toString());
-                    data.add(datanum);
+                    stringMap.put("TransDate",sqlDate.toString());
+                    if (rs.getString("Notes") == null) {
+                        stringMap.put("Notes","null");
+                    } else {
+                        stringMap.put("Notes",rs.getString("Notes"));
+                    }
+                    data.add(stringMap);
                 }
 
 
@@ -252,25 +255,25 @@ public class CRUD_Operations {
                 stmt = connect.createStatement();
                 ResultSet rs = stmt.executeQuery(query);
                 while (rs.next()) {
-                    datanum = new HashMap<>();
-                    datanum.put("Vserial",rs.getString("Serial"));
+                    stringMap = new HashMap<>();
+                    stringMap.put("Vserial",rs.getString("Serial"));
                     if (rs.getString("TransNum") == null) {
-                        datanum.put("TransNum","null");
+                        stringMap.put("TransNum","null");
                     } else {
-                        datanum.put("TransNum",rs.getString("TransNum"));
+                        stringMap.put("TransNum",rs.getString("TransNum"));
                     }
 //                    if(rs.wasNull()){datanum.add("null");}
-                    datanum.put("TransCode",rs.getString("TransCode"));
+                    stringMap.put("TransCode",rs.getString("TransCode"));
 //                    rs.getDate("TransDate").toString();
-                    datanum.put("TransDate",rs.getDate("TransDate").toString());
+                    stringMap.put("TransDate",rs.getDate("TransDate").toString());
 //                    datanum.add(rs.getString("TransType"));
                     if (rs.getString("Notes") == null) {
-                        datanum.put("Notes","null");
+                        stringMap.put("Notes","null");
                     } else {
-                        datanum.put("Notes",rs.getString("Notes"));
+                        stringMap.put("Notes",rs.getString("Notes"));
                     }
 //                    if(rs.wasNull()){datanum.add("null");}
-
+                    data.add(stringMap);
                 }
 
 
@@ -402,16 +405,13 @@ public class CRUD_Operations {
 
     public List<String> SelectUsers(String user_name, String password) {
         Statement stmt = null;
-
 //        String data = "N/A";
-        List<String> datanum = new ArrayList<>();
-        Connection connect = null;
+       datanum = new ArrayList<>();
+//        Connection connect = null;
         try {
 
-            connect = conStr.connectionclasss();        // Connect to database
-            if (connect == null) {
-                ConnectionResult = "Check Your Internet Access!";
-            } else {
+            connect = getconnection();        // Connect to database
+            if (connect != null)  {
                 // Change below query according to your own database.
                 //
                 String query = "SELECT Users.UserName ,Users.Password  FROM Users INNER JOIN UserRights ON Users.UserName=UserRights.UserName \n" +
@@ -475,10 +475,9 @@ public class CRUD_Operations {
         String serverdate = "";
         try {
 
-            connect = conStr.connectionclasss();        // Connect to database
-            if (connect == null) {
-                ConnectionResult = "Check Your Internet Access!";
-            } else {
+            connect = getconnection();        // Connect to database
+            if (connect != null)
+            {
                 // Change below query according to your own database.
                 //
                 String query = "SELECT CONVERT(Date, GETDATE()) as serverdate";
@@ -549,7 +548,7 @@ public class CRUD_Operations {
         else return null;
     }
 
-    public boolean InsertNewSerials(Map<String, String> hdr, String Branchcode, String MISUser, Context context) {
+    boolean InsertNewSerials(Map<String, String> hdr, String Branchcode, String MISUser, Context context) {
         Statement stmt = null;
         String Current_serial="", Current_itemcode ="";
         List<Map<String, String>> new_serial ;
@@ -568,14 +567,14 @@ public class CRUD_Operations {
                     for (Map<String, String> dtl : select_details)
                     {
                         new_serial = getItemSerial(dtl.get("ID"), context);
-                        String DocNum = dtl.get("Serial").substring(1 + indexOf(dtl.get("Serial"), (hdr.get("trans_type").equals("1")) ? "r" : "i"));
+                        String DocNum = hdr.get("item_serial").substring(1 + indexOf(hdr.get("item_serial"), (hdr.get("trans_type").equals("1")) ? "r" : "i"));
                         if (new_serial.size()>0) {
                             for (Map<String, String> srl : new_serial)
                                 Found = ((hdr.get("trans_type").equals("1")) || CheckSerialIn(srl.get("SerialNum"), dtl.get("ItemCode"), GetStore(Branchcode)));
                         } else continue;
 
                         for (Map<String, String> srl : new_serial) {
-                            SQL = "INSERT INTO ItemSerials(ID,Serial,TransCode,TransNum,TransDate,DocNum,ItemCode,SerialNum,IssuedBy) VALUES(";
+                            String SQL = "INSERT INTO ItemSerials(ID,Serial,TransCode,TransNum,TransDate,DocNum,ItemCode,SerialNum,IssuedBy) VALUES(";
                             //  if drH("IsNew"){
                             //  SQL = SQL & Serial & "_VCH_" & drD("ItemCode") & "_1','"
 //                                  SQL = SQL+ (mID+ ",");}
@@ -596,7 +595,7 @@ public class CRUD_Operations {
                         return true;
                     }
                     try {
-                        if (!Found || stmt.executeBatch().length != num) //case not founded and
+                        if (!Found || stmt.executeBatch().length <0) //case not founded and
                         {
                             Sql_MSG = "Can not add Serial Numbers " + Current_serial + " in Item " + Current_itemcode + " In Voucher " + select_details.get(0).get("Serial") + (!Found ? ", Serial number not found." : ".");
                             isSaved = false;
@@ -684,11 +683,11 @@ public class CRUD_Operations {
         } finally {
             if (stmt != null) try {
                 stmt.close();
-            } catch (Exception e) {
+            } catch (Exception e) {e.getMessage();
             }
             if (connect3 != null) try {
                 connect3.close();
-            } catch (Exception e) {
+            } catch (Exception e) {e.getMessage();
             }
         }
 
@@ -1049,7 +1048,9 @@ public class CRUD_Operations {
             } catch (Exception e) {
                 e.getMessage();
             }
-
+            if (con != null) {
+                con.setAutoCommit(true);
+            }
         }
 
         return isSuccess;

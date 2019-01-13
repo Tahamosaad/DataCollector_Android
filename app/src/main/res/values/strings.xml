@@ -93,6 +93,7 @@
     <string name="notifications">Notifications</string>
     <string name="Date_time">10.10   00/00/ 0000</string>
     <string name="notification">Notifications</string>
+    <string name="log_activity">Log Activities</string>
     <string name="sent_vouchers">Sent Vouchers</string>
     <string name="total_serials">Total Serials</string>
     <string name="total_items">Total Items</string>

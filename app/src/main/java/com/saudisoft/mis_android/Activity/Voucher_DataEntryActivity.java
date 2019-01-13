@@ -46,7 +46,8 @@ public class Voucher_DataEntryActivity extends AppCompatActivity {
     ArrayList<String> repeated_serial= new ArrayList<>();
     List<ItemsInOutH> headerList;
     List<ItemSerials> saved_serials;
-//    List<Map<String,String>> item_serials;
+    List<Map<String,String>> myserials;
+    //    List<Map<String,String>> item_serials;
 //     boolean result;
     FloatingActionButton btn_add_serial;
     EditText scanner_input;
@@ -353,7 +354,7 @@ public class Voucher_DataEntryActivity extends AppCompatActivity {
                         //set what would happen when positive button is clicked
                         //10- save or update Serials in Locally serial table
                         if (SaveSerials()) {
-                            Toast.makeText(Voucher_DataEntryActivity.this, "New Serials has been Saved Successfully", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(Voucher_DataEntryActivity.this, "Serials has been Saved Successfully", Toast.LENGTH_SHORT).show();
                             ClearList();
                         } else
                             Toast.makeText(Voucher_DataEntryActivity.this, "Saved Failed", Toast.LENGTH_SHORT).show();
@@ -373,7 +374,7 @@ public class Voucher_DataEntryActivity extends AppCompatActivity {
         {
             if(SaveSerials())
             {
-                Toast.makeText(Voucher_DataEntryActivity. this, "New Serials has been Saved Successfully", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Voucher_DataEntryActivity. this, "Serials has been Saved Successfully", Toast.LENGTH_SHORT).show();
                 ClearList();
             } else Toast.makeText(Voucher_DataEntryActivity.this, "Saved Failed", Toast.LENGTH_SHORT).show();
         }
@@ -386,12 +387,16 @@ public class Voucher_DataEntryActivity extends AppCompatActivity {
         this.finish(); // Destroy activity A and not exist in Back stack
     }
     private boolean SaveSerials(){
-        try{
-        for (int i = 0; i < arrayadapter.getCount(); i++) {
-            ItemSerial_DAO.addItemSerials(new ItemSerials(serialnum,arrayadapter.getItem(i),  mid));
+        try{if(arrayadapter.getCount()>0){
+            saved_serials= ItemSerial_DAO.getSavedSerials(mid);
+            List<String> new_srl= SymmetricDifference();
+            for (int i = 0; i < new_srl.size(); i++) {
+            ItemSerial_DAO.addItemSerials(new ItemSerials(serialnum,new_srl.get(i),  mid));
         }
+
         saved_serials= ItemSerial_DAO.getSavedSerials(mid);
-        return saved_serials.size()>0;
+        return saved_serials.size()>0;}
+            else return false;
     }catch (Exception ex){Toast.makeText(this, ex.getMessage(), Toast.LENGTH_LONG).show();
         return false;}
     }
@@ -425,6 +430,27 @@ public class Voucher_DataEntryActivity extends AppCompatActivity {
         Serials_LV.setAdapter(arrayadapter);
         listcount2.setText(getlistcount(Serials_LV));//show the list count
         Serials_LV.setSelection(Serials_LV.getCount());// restore the position of listview
+
+    }
+    private  List<String> SymmetricDifference(){
+        List<String> list1 = new ArrayList<>();
+        List<String> list2 = new ArrayList<>();
+        for (int i = 0; i < arrayadapter.getCount(); i++) {
+            list2.add(arrayadapter.getItem(i));
+        }
+     if(saved_serials.size()>0 ){
+         for (ItemSerials srl : saved_serials) {
+             list1.add(srl.getSerial());
+         }
+
+         // Prepare an intersection
+         List<String> intersection = new ArrayList<>(list1);
+         (list2).removeAll(intersection); // Subtract the intersection from the union
+         return list2 ;
+
+     }
+     else
+        return list2;
 
     }
     boolean CheckDuplicates(final ArrayList<String> serial_list) {

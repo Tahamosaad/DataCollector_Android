@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.saudisoft.mis_android.DAO.Setting_DAO;
+import com.saudisoft.mis_android.ExternalDatabase.CRUD_Operations;
 import com.saudisoft.mis_android.Model.Settings;
 import com.saudisoft.mis_android.R;
 
@@ -28,6 +29,8 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
     private EditText mTxtServerName,mTxtDatabaseName,mTxtBranchcode,mTxtDB_username;
     private Setting_DAO db;
     private  Button mBtnSave;
+    CRUD_Operations new_data;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,21 +39,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         initViews();
 
 
-        this.db = new Setting_DAO(this);
 
-//         Reading all settings
-//        Log.d("Reading: ", "Reading all contacts..");
-        List<Settings> settings = db.getAllSettings1();
-
-        for (Settings cn : settings) {
-            mTxtServerName.setText(cn.getServerName());
-            mTxtDatabaseName.setText(cn.getDatabaseName());
-            mTxtBranchcode.setText(cn.getBranchCode());
-
-//            String log = "ServerName: "+cn.getServerName()+" ,DBname: " + cn.getDatabaseName() + " ,Branchcode: " + cn.getBranchCode()+ " ,username: " + cn.getLastUserName();
-//            // Writing Contacts to log
-//            Log.d("Name: ", log);
-    }
     }
     private void initViews() {
 
@@ -63,10 +52,24 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
 //        mTxtDB_username = (EditText)findViewById(R.id.txt_last_name);
         mBtnSave = (Button) findViewById(btn_save);
         mBtnSave.setOnClickListener(this);
+        this.db = new Setting_DAO(this);
+
+//         Reading all settings
+        List<Settings> settings = db.getAllSettings1();
+
+        for (Settings cn : settings) {
+            mTxtServerName.setText(cn.getServerName());
+            mTxtDatabaseName.setText(cn.getDatabaseName());
+            mTxtBranchcode.setText(cn.getBranchCode());
+
+//            String log = "ServerName: "+cn.getServerName()+" ,DBname: " + cn.getDatabaseName() + " ,Branchcode: " + cn.getBranchCode()+ " ,username: " + cn.getLastUserName();
+//            // Writing Contacts to log
+//            Log.d("Name: ", log);
+        }
     }
     private int checkempForm() {
         EditText[] allFields = {mTxtServerName, mTxtBranchcode,mTxtDatabaseName};
-        List<EditText> ErrorFields =new ArrayList<EditText>();;
+        List<EditText> ErrorFields =new ArrayList<>();
         for(EditText edit : allFields){
             if(TextUtils.isEmpty(edit.getText()))
             {
@@ -95,28 +98,35 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                 Editable dataBase = mTxtDatabaseName.getText();
             if (checkempForm()>0)
             {
-                if (this.db.updateSettings(new Settings(mTxtServerName.getText().toString(),mTxtDatabaseName.getText().toString(),mTxtBranchcode.getText().toString(),"sa"))<=3);
-                {
-                Toast.makeText(this,"updata data Success", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(SettingActivity.this, InitializeDataBaseActivity.class);
-                    startActivity(intent);
-//                this.finish();
-                }
-//                else
-//                    { Toast.makeText(this, R.string.empty_fields_message, Toast.LENGTH_LONG).show();}
-            }
-
 
 
             if (!TextUtils.isEmpty(serverName) && !TextUtils.isEmpty(branch) && !TextUtils.isEmpty(dataBase))
                      {
+                         this. new_data = new CRUD_Operations(mTxtDatabaseName.getText().toString(),mTxtServerName.getText().toString());
+                      if(  new_data.getconnection()!=null){
+                         if(isInserted()>0)
+                        {
+                            Toast.makeText(this,"updata data Success", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(SettingActivity.this, InitializeDataBaseActivity.class);
+                            startActivity(intent);
+                            this.finish();
+                        }
+                        }
+                        else
+                            Toast.makeText(this,"Connection Fail !", Toast.LENGTH_SHORT).show();
 
-                         this.db.addSetting (new Settings(mTxtServerName.getText().toString(),mTxtDatabaseName.getText().toString(),mTxtBranchcode.getText().toString(),"sa"));
                      }
                 else { Toast.makeText(this, R.string.empty_fields_message, Toast.LENGTH_LONG).show();}
 
-
         }
+        }
+    }
+    private int isUpdated(){
+     return db.updateSettings(new Settings(mTxtServerName.getText().toString(),mTxtDatabaseName.getText().toString(),mTxtBranchcode.getText().toString(),"sa"));
+    }
+    private long isInserted(){
+        return db.addSetting (new Settings(mTxtServerName.getText().toString(),mTxtDatabaseName.getText().toString(),mTxtBranchcode.getText().toString(),"sa"));
+
     }
 
 }

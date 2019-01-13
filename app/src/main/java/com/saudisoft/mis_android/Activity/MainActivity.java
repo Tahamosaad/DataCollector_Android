@@ -37,19 +37,61 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     NavigationView navigationView;
     private InvTransTypes_DAO transTypes_dao;
-    private Setting_DAO Setting_DAO;
     private ActionBarDrawerToggle mDrawerToggle;
-    private DrawerLayout drawerLayout;
     private final String DEFAULT = "N/A";
     private EditText mUsername,mPassword;
-    private TextView mMessage,Imported_V_tv,Sent_V_tv,Created_V_tv,MISUser_tv,Sys_MSG_tv,totalitem_tv,totalsrl_tv,Datetime_tv,User_nav,Branch_nav,Notification_tv;
+    private TextView Imported_V_tv;
+    private TextView Sent_V_tv;
+    private TextView Created_V_tv;
+    private TextView MISUser_tv;
+    private TextView Sys_MSG_tv;
+    private TextView totalitem_tv;
+    private TextView totalsrl_tv;
+    private TextView Datetime_tv;
+    private TextView User_nav;
+    private TextView Branch_nav;
+    private TextView Notification_tv;
     List<Settings> setting;
     CRUD_Operations new_data;
     Sync_Data my_data;
     String Result;
     int sentcount=0;
     private  String DBNAME,DBserver,Branchcode;
+    private void initViews()
+    {
 
+        this.transTypes_dao = new InvTransTypes_DAO(this);
+        com.saudisoft.mis_android.DAO.Setting_DAO setting_DAO = new Setting_DAO(this);
+        navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        View headerView = navigationView.getHeaderView(0);
+
+        Imported_V_tv = (TextView) findViewById(R.id.TV_iv);
+        Created_V_tv=(TextView)findViewById(R.id.TV_cv) ;
+        Sent_V_tv=(TextView)findViewById(R.id.TV_sv) ;
+        Notification_tv=(TextView)findViewById(R.id.status_header_TV);
+        Sys_MSG_tv = (TextView)findViewById(R.id.status_TV) ;
+        totalitem_tv=(TextView)findViewById(R.id.totalitem_TV);
+        totalsrl_tv=(TextView)findViewById(R.id.totalserial_TV);
+        MISUser_tv=(TextView)findViewById(R.id.username_TV) ;
+        User_nav=headerView. findViewById(R.id.user_name_txt) ;
+        Branch_nav=headerView.findViewById(R.id.branch_name_txt) ;
+        Datetime_tv=(TextView)findViewById(R.id.date_time_TV) ;
+
+        Created_V_tv.setOnClickListener(this);
+        Sent_V_tv.setOnClickListener(this);
+        Imported_V_tv.setOnClickListener(this);
+        this.setting = setting_DAO.getAllSettings1();
+        for (Settings cn : setting) {
+            DBNAME= cn.getDatabaseName();
+            DBserver= cn.getServerName();
+            Branchcode = cn.getBranchCode();
+        }
+        this. new_data = new CRUD_Operations(DBNAME,DBserver);
+        this.my_data = new Sync_Data(DBNAME,Branchcode,DBserver,this);
+        //load data from saved shared preferences to this activity
+
+        update_txt();
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,8 +99,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         initViews();
-
         ChkInvTransData();
+
+        // region Check connection dialog
         if (!CheckConnectionSettings()){
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 //set icon
@@ -87,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }).show();
         }
+        //endregion
         //region  side navigation
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -152,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         // endregion
-        drawerLayout = (DrawerLayout) findViewById(R.id.DrawerLayout);
+        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.DrawerLayout);
         mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close) {
             @Override
             public void onDrawerClosed(View drawerView) {
@@ -176,41 +220,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mDrawerToggle.syncState();
     }
 
-    private void initViews()
-    {
 
-        this.transTypes_dao = new InvTransTypes_DAO(this);
-        this.Setting_DAO = new Setting_DAO(this);
-        navigationView = (NavigationView) findViewById(R.id.navigation_view);
-        View headerView = navigationView.getHeaderView(0);
-
-        Imported_V_tv = (TextView) findViewById(R.id.TV_iv);
-        Created_V_tv=(TextView)findViewById(R.id.TV_cv) ;
-        Sent_V_tv=(TextView)findViewById(R.id.TV_sv) ;
-        Notification_tv=(TextView)findViewById(R.id.status_header_TV);
-        Sys_MSG_tv = (TextView)findViewById(R.id.status_TV) ;
-        totalitem_tv=(TextView)findViewById(R.id.totalitem_TV);
-        totalsrl_tv=(TextView)findViewById(R.id.totalserial_TV);
-        MISUser_tv=(TextView)findViewById(R.id.username_TV) ;
-        User_nav=(TextView)headerView. findViewById(R.id.user_name_txt) ;
-        Branch_nav=(TextView)headerView.findViewById(R.id.branch_name_txt) ;
-        Datetime_tv=(TextView)findViewById(R.id.date_time_TV) ;
-
-        Created_V_tv.setOnClickListener(this);
-        Sent_V_tv.setOnClickListener(this);
-        Imported_V_tv.setOnClickListener(this);
-        this.setting = Setting_DAO.getAllSettings1();
-        for (Settings cn : setting) {
-        DBNAME= cn.getDatabaseName();
-        DBserver= cn.getServerName();
-        Branchcode = cn.getBranchCode();
-        }
-        this. new_data = new CRUD_Operations(DBNAME,DBserver);
-        this.my_data = new Sync_Data(DBNAME,Branchcode,DBserver,this);
-        //load data from saved shared preferences to this activity
-
-        update_txt();
-    }
     public boolean CheckConnectionSettings(){return !(setting.size()<1);}
     // check if invtrans type table is empty or not
     private void ChkInvTransData(){
@@ -227,6 +237,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Imported_V_tv.setText("0");
             Sent_V_tv.setText("0");
             Created_V_tv.setText("0");
+            totalsrl_tv.setText("0");
             MISUser_tv.setText("");
         }
 
@@ -290,8 +301,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         if(v==Created_V_tv) {
             if (isNetworkAvailable()) {
-                startActivity(new Intent(MainActivity.this, CreateVoucher.class));
-                MainActivity.this.finish();
+                createAndShowDialog(CreateVoucher.class);
             }else
                 Toast.makeText(this,"Please Check your connection", Toast.LENGTH_SHORT).show();
 
@@ -303,7 +313,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Toast.makeText(this,"Please Check your connection", Toast.LENGTH_SHORT).show();
         if(v==Imported_V_tv)
         {startActivity(new Intent(MainActivity.this, Voucher_DataEntryActivity.class));
-        MainActivity.this.finish();}
+        finish();}
 
 
 
@@ -326,7 +336,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         View v = inflater.inflate( R.layout.login_dialog, null );
         // Pass null as the parent view because its going in the dialog layout
         v.findViewById( R.id.panel );
-        builder.setTitle("LOGIN DIALOG");
+        builder.setTitle("MIS USER LOGIN ");
         builder.setIcon(R.drawable.ic_profile_img);
         builder.setView( v );
         mUsername =  v.findViewById(R.id.username);
@@ -343,17 +353,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     startActivity(new Intent(MainActivity.this, ActivityToOpen));
                     MainActivity.this.finish();}
                     else {
-                        Result = my_data.sync_data();
-                        if (!Result.isEmpty() ){
-                            SharedPreferences sharedPreferences = getSharedPreferences( "User_data", Context.MODE_PRIVATE );
+                        my_data.sync_data();
 
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            sentcount=Integer.valueOf( sharedPreferences.getString("sendcount","0"))+1;
-                            editor.putString("sendmsg", Result);
-                            editor.putString("sendcount", sentcount+"");
-                            editor.apply();
-//                            Toast.makeText(MainActivity.this, Result, Toast.LENGTH_SHORT).show();
-                        }
                     }update_txt();
                 }
                 else
@@ -385,18 +386,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return thisAlertDialog != null && thisAlertDialog.isShowing();
     }
     public void update_txt(){
+
         SharedPreferences get = this.getSharedPreferences( "User_data",MODE_PRIVATE );
-        MISUser_tv.setText(get.getString("name",DEFAULT));
+        SharedPreferences.Editor editor = get.edit();
+        MISUser_tv.setText(get.getString("name",""));
         Calendar cal = Calendar.getInstance();
         String mDate= cal.get(Calendar.HOUR)+":"+cal.get(Calendar.MINUTE)+ "\n"+cal.get(Calendar.DATE)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+cal.get(Calendar.YEAR);
         Datetime_tv.setText(mDate);
         User_nav.setText(MISUser_tv.getText());
-        Branch_nav.setText(new_data.GetStore(Branchcode));
-        Sys_MSG_tv.setText(get.getString("sendmsg",DEFAULT));
-        Imported_V_tv.setText(my_data.ItemHeaderCount()+"");
-        totalitem_tv.setText(my_data.ItemDetailCount()+"");
+        Branch_nav.setText(get.getString("branch_name",""));
+        Sys_MSG_tv.setText( get.getString("sendmsg",""));
+        editor.remove("sendmsg").apply();
+        Imported_V_tv.setText(String.valueOf(my_data.ItemHeaderCount()));
+        totalitem_tv.setText(String.valueOf( my_data.ItemDetailCount()));
         Sent_V_tv.setText(get.getString("sendcount","0"));
-        totalsrl_tv.setText(my_data.ItemSerialCount()+"");
+        totalsrl_tv.setText(String.valueOf(my_data.ItemSerialCount()));
     }
     public  boolean Save()
     {
@@ -421,7 +425,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Pass null as the parent view because its going in the dialog layout
         v.findViewById( R.id.panel1 );
         builder.setView( v );
-        mMessage = v.findViewById(R.id.msg_txt);
+        TextView mMessage = v.findViewById(R.id.msg_txt);
         mMessage.setText(MSG);
         builder .setIcon(R.drawable.ic_warning) .setTitle("Sync Data Message");
                 //set title

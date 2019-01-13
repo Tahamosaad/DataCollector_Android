@@ -42,17 +42,15 @@ public class Setting_DAO {
             e.printStackTrace();
         }
     }
-
-
-
-    public void open() throws SQLException {
+    private void open() throws SQLException {
         mDatabase = mDbHelper.getWritableDatabase();
     }
     public void close() {
         mDbHelper.close();
     }
     // Adding new settings
-   public void addSetting(Settings setting) {
+   public long addSetting(Settings setting) {
+//       deleteSettings(setting);
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -62,26 +60,24 @@ public class Setting_DAO {
         values.put(DBHelper.COLUMN_DATABASE_USER_NAME, setting.getDataBaseUserName());
 
         // Inserting Row
-        db.insert(DBHelper.TABLE_SETTINGS, null, values);
+       long ER= db.insert(DBHelper.TABLE_SETTINGS, null, values);
         db.close(); // Closing database connection
+       return ER;
     }
-    public Settings createSettings(String servername, String databasename,String branchcode, String databaseusername,String databasepassword) {
+    public int updateSettings(Settings setting) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
         ContentValues values = new ContentValues();
-        values.put(DBHelper.COLUMN_SERVER_NAME, servername);
-        values.put(DBHelper.COLUMN_DATABASE_NAME, databasename);
-        values.put(DBHelper.COLUMN_BRANCH_CODE, branchcode);
-        values.put(DBHelper.COLUMN_DATABASE_USER_NAME, databaseusername);
+        values.put(DBHelper.COLUMN_BRANCH_CODE, setting.getBranchCode());
+        values.put(DBHelper.COLUMN_DATABASE_NAME, setting.getDatabaseName());
+        values.put(DBHelper.COLUMN_DATABASE_USER_NAME, setting.getDatabaseName());
 
-
-
-        Cursor cursor = mDatabase.query(DBHelper.TABLE_SETTINGS, mAllColumns,null, null, null, null, null);
-        cursor.moveToFirst();
-        Settings newsettings = cursorToSettings(cursor);
-        cursor.close();
-        return newsettings;
+        // updating row
+        return db.update(DBHelper.TABLE_SETTINGS, values, DBHelper.COLUMN_SERVER_NAME + " = ?",
+                new String[] { String.valueOf(setting.getServerName()) });
     }
     public List<Settings> getAllSettings1() {
-        List<Settings> contactList = new ArrayList<Settings>();
+        List<Settings> contactList = new ArrayList<>();
         // Select All Query
         String selectQuery = "SELECT  * FROM " + DBHelper.TABLE_SETTINGS;
 
@@ -101,12 +97,12 @@ public class Setting_DAO {
                 contactList.add(setting);
             } while (cursor.moveToNext());
         }
-
+        cursor.close();
         // return contact list
         return contactList;
     }
     public List<Settings> getAllSettings() {
-        List<Settings> listSettings = new ArrayList<Settings>();
+        List<Settings> listSettings = new ArrayList<>();
 
         Cursor cursor = mDatabase.query(DBHelper.TABLE_SETTINGS, mAllColumns,null, null, null, null, null);
 
@@ -120,28 +116,30 @@ public class Setting_DAO {
         cursor.close();
         return listSettings;
     }
+    public Settings createSettings(String servername, String databasename,String branchcode, String databaseusername,String databasepassword) {
+        ContentValues values = new ContentValues();
+        values.put(DBHelper.COLUMN_SERVER_NAME, servername);
+        values.put(DBHelper.COLUMN_DATABASE_NAME, databasename);
+        values.put(DBHelper.COLUMN_BRANCH_CODE, branchcode);
+        values.put(DBHelper.COLUMN_DATABASE_USER_NAME, databaseusername);
+
+
+
+        Cursor cursor = mDatabase.query(DBHelper.TABLE_SETTINGS, mAllColumns,null, null, null, null, null);
+        cursor.moveToFirst();
+        Settings newsettings = cursorToSettings(cursor);
+        cursor.close();
+        return newsettings;
+    }
     public void deleteSettings(Settings setting) {
         String servername = setting.getServerName();
-        System.out.println("the deleted settings has the servername: " + servername);
+//        System.out.println("the deleted settings has the servername: " + servername);
         mDatabase.delete(DBHelper.TABLE_SETTINGS, DBHelper.COLUMN_SERVER_NAME
                 + " = " + servername, null);
     }
     // Updating single setting
-    public int updateSettings(Settings setting) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(DBHelper.COLUMN_BRANCH_CODE, setting.getBranchCode());
-        values.put(DBHelper.COLUMN_DATABASE_NAME, setting.getDatabaseName());
-        values.put(DBHelper.COLUMN_DATABASE_USER_NAME, setting.getDatabaseName());
-
-        ;
-        // updating row
-        return db.update(DBHelper.TABLE_SETTINGS, values, DBHelper.COLUMN_SERVER_NAME + " = ?",
-                new String[] { String.valueOf(setting.getServerName()) });
-    }
     public List<Settings> getSettingsOfApplication(String servername) {
-        List<Settings> listSetting = new ArrayList<Settings>();
+        List<Settings> listSetting = new ArrayList<>();
 
         Cursor cursor = mDatabase.query(DBHelper.TABLE_SETTINGS, mAllColumns,
                 DBHelper.COLUMN_SERVER_NAME + " = ?",

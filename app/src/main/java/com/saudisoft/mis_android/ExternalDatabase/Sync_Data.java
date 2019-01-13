@@ -15,7 +15,6 @@ import com.saudisoft.mis_android.Model.ItemSerials;
 import com.saudisoft.mis_android.Model.ItemsInOutH;
 import com.saudisoft.mis_android.Model.ItemsInOutL;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -26,23 +25,17 @@ import static android.content.Context.MODE_PRIVATE;
  */
 
 public class Sync_Data {
-    public String  TType,TDate,Tnum,Tcode,mNote,mIsnew,mSerial,mQTY;
-    private int total_QTY;
     private String save_MSG = "";
-    private  String DBNAME,Branchcode,DBserver,serialnum,mid,itemcode, MISUser;
+    private  String DBNAME;
+    private String Branchcode;
+    private String DBserver;
+    private String MISUser;
     private ItemInOutH_DAO ItemHeader_DAO;
     private ItemsInOutL_DAO ItemDetail_DAO;
     private ItemsSerials_DAO ItemSerial_DAO;
     private final String DEFAULT = "N/A";
     List<Map<String,String>> item_serials;
-    //    public boolean confirm =false;
-    private List<ItemsInOutH> headerList;
-    private List<Map<String, String>> headerList2;
-    private List<Map<String,String>> select_details;
-    private List<Map<String,String>> saved_serials;
     private CRUD_Operations new_data;
-    private ArrayList<String> newserial = new ArrayList<>();
-    // variable to hold context
     private Context context;
     public Sync_Data(String DBNAME, String branchcode, String DBserver,Context context) {
         this.DBNAME = DBNAME;
@@ -90,56 +83,54 @@ public class Sync_Data {
 ////            }
 //        }return save_MSG;
 //    }
-    private void getData(){
+    public void sync_data(){
         init_Data();
-        headerList =this.ItemHeader_DAO.getAllItemheader();
+        List<ItemsInOutH> headerList = this.ItemHeader_DAO.getAllItemheader();
         if(headerList.size()>0) {
             here:   for (ItemsInOutH hdr : headerList)
             {
-                headerList2 = this.ItemHeader_DAO.getItemHeader(hdr.getSerial());
+                List<Map<String, String>> headerList2 = this.ItemHeader_DAO.getItemHeader(hdr.getSerial());
 
-                 for (Map<String ,String > hdr2 : headerList2){
+                for (Map<String ,String > hdr2 : headerList2){
                     if (!send_serials(hdr2))
                     { if(SaveDialog((new_data.Sql_MSG != null ? new_data.Sql_MSG : ".") + "\n" +" Next Voucher ?",context))
-                            continue here;
-                        else break here;
+                    {   SaveLog(new_data.Sql_MSG,false);
+                        continue here;
                     }
-                    else {save_MSG = "Vouchers Saved";
-                        deleteallvoucher(hdr.getSerial());break here;
+                       else {  SaveLog(new_data.Sql_MSG,false);
+                        break here;
+                    }
+                    }
+                    else {
+                        SaveLog("Voucher"+hdr.getSerial()+" Sent",true);
+                        deleteallvoucher(hdr.getSerial()); continue here;
+
                     }
                 }
             }
         }
- else save_MSG = "No Voucher Founded \n Please Import Voucher first";
+ else SaveLog("No Voucher Founded \n Please Import Voucher first",false);
     }
 
     private List<Map<String,String>> getItemDetails(String serial){
-        select_details= ItemDetail_DAO.getItemDetails(serial);
-//        mQTY=select_details.get(0).get("QTY");
-//        total_QTY+=Integer.valueOf(mQTY);
-//        for (String  Key : select_details.get(0).keySet()) {
-//            total_QTY +=  Integer.valueOf(select_details.get(0).get("QTY"));
-//        }
-        return select_details;
+        return ItemDetail_DAO.getItemDetails(serial);
     }
     private boolean getItemSerial(){
-        saved_serials = ItemSerial_DAO.getItemSerials(mid);
-        if(saved_serials.size()>0){
-//            if(saved_serials.size()!=Integer.valueOf(mQTY))
-//            {save_MSG=save_MSG+"Voucher :"+serialnum+"items QTY ="+total_QTY+"founded "+saved_serials.size()+ "\n";}
-            newserial.clear();
-            for (Map<String,String> srl: saved_serials) {
-                newserial.add( srl.get("SerialNum"));
-            }
-            return true;
-
-        }else return false;
+//        ArrayList<String> newserial = new ArrayList<>();
+//        saved_serials = ItemSerial_DAO.getItemSerials(mid);
+//        if(saved_serials.size()>0){
+////            if(saved_serials.size()!=Integer.valueOf(mQTY))
+////            {save_MSG=save_MSG+"Voucher :"+serialnum+"items QTY ="+total_QTY+"founded "+saved_serials.size()+ "\n";}
+//            newserial.clear();
+//            for (Map<String,String> srl: saved_serials) {
+//                newserial.add( srl.get("SerialNum"));
+//            }
+//            return true;
+//
+//        }else
+            return false;
     }
-    public   String    sync_data() {
 
-        getData();
-        return save_MSG ;
-    }
     private boolean  send_serials(Map<String ,String > headerList){
         new_data = new CRUD_Operations(DBNAME,DBserver);
 
@@ -150,10 +141,10 @@ public class Sync_Data {
 
         for(Map<String,String> dtl : getItemDetails(VoucherNum))
             {
-                mid =   dtl.get("ID");
-                itemcode =dtl.get("ItemCode");
+                String mid = dtl.get("ID");
+                String itemcode = dtl.get("ItemCode");
                 ItemDetail_DAO.deleteItemDetails(new ItemsInOutL(mid, "", "", 0, itemcode, VoucherNum));
-                saved_serials = ItemSerial_DAO.getItemSerials(mid);
+                List<Map<String, String>> saved_serials = ItemSerial_DAO.getItemSerials(mid);
                 for (Map<String,String> srl : saved_serials) {
                     if (saved_serials.size()>0)
                     ItemSerial_DAO.deleteItemSerials(new ItemSerials(srl.get("SerialNum"), VoucherNum, mid));
@@ -182,7 +173,7 @@ public class Sync_Data {
         else return 0;
     }
     public int ItemSerialCount() {
-        total_QTY=0;
+        int total_QTY = 0;
         List<Map<String,String >> Detiallist;
         Detiallist = this.ItemDetail_DAO.GetAllItemDetails();
         for (Map<String,String > dtl:Detiallist) {
@@ -193,9 +184,6 @@ public class Sync_Data {
 
 
 
-    public boolean isAlertDialogShowing(AlertDialog thisAlertDialog) {
-        return thisAlertDialog != null && thisAlertDialog.isShowing();
-    }
     private boolean mResult;
     private boolean SaveDialog(String message, Context context) {
         String title="";
@@ -232,4 +220,25 @@ public class Sync_Data {
 
         return mResult;
     }
+    private   void SaveLog(String save_MSG,boolean isSaved)
+    {
+        SharedPreferences sharedPreferences = context. getSharedPreferences( "User_data", Context.MODE_PRIVATE );
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        String log = ((sharedPreferences.getString("sendmsg","").isEmpty()) ? save_MSG : save_MSG+"\n"+sharedPreferences.getString("sendmsg",""));
+
+        if (isSaved)
+        {
+            editor.putString("sendmsg", log);
+            int sentcount = Integer.valueOf(sharedPreferences.getString("sendcount", "0")) + 1;
+            editor.putString("sendcount", sentcount +"");
+        }else
+        editor.putString("sendmsg",log );
+
+//         editor.commit();
+        editor.apply();
+    }
+    public boolean isAlertDialogShowing(AlertDialog thisAlertDialog) {
+        return thisAlertDialog != null && thisAlertDialog.isShowing();
+    }
+
 }

@@ -126,9 +126,9 @@ public class DBHelper extends SQLiteOpenHelper {
 
 	// Create Table Statement
 	public static final String SQL_CREATE_TABLE_ITEM_SERIAL = "CREATE TABLE IF NOT EXISTS "+TABLE_ITEM_SERIAL+" ( " +
-			COL_SERIALNUM + " TEXT NOT NULL PRIMARY KEY," +
-			COL_ID + " TEXT NOT NULL," +
-			COL_VSERIAL + " TEXT );";
+			COL_SERIALNUM + " TEXT ," +
+			COL_ID + " TEXT NOT NULL ," +
+			COL_VSERIAL + " TEXT NOT NULL);";
 	// Create Table Statement
 	public static final String SQL_CREATE_TABLE_ITEM_DIRECTORY = "CREATE TABLE IF NOT EXISTS "+TABLE_ITEM_DIRECTORY+" ( " +
 			COL_ITEMCODE + " TEXT NOT NULL PRIMARY KEY ," +
